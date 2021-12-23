@@ -1,168 +1,123 @@
-import com.github.mgk.gradle.*
+import org.opensearch.gradle.test.RestIntegTestTask
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'opensearch.opensearchplugin'
+apply plugin: 'opensearch.yaml-rest-test'
+
+def pluginName = pluginName
+def pluginDescription = pluginDescription
+//def projectPath = 'org.opensearch'
+//def pathToPlugin = 'path.to.plugin'
+def pluginClassName = pluginClassname
+
+//tasks.register("preparePluginPathDirs") {
+//    mustRunAfter clean
+//    doLast {
+//        def newPath = pathToPlugin.replace(".", "/")
+//        mkdir "src/main/java/org/opensearch/$newPath"
+//        mkdir "src/test/java/org/opensearch/$newPath"
+//        mkdir "src/yamlRestTest/java/org/opensearch/$newPath"
+//    }
+//}
+
+opensearchplugin {
+    name pluginName
+    description pluginDescription
+//    classname "${projectPath}.${pathToPlugin}.${pluginClassName}"
+    classname pluginClassName
+    licenseFile rootProject.file('LICENSE.txt')
+    noticeFile rootProject.file('NOTICE.txt')
+}
+
+// thirdparty audit needs can be enabled
+thirdPartyAudit.enabled = false
+
+// This requires an additional Jar not published as part of build-tools
+loggerUsageCheck.enabled = false
+
+// No need to validate pom, as we do not upload to maven/sonatype
+validateNebulaPom.enabled = false
 
 buildscript {
+
     ext {
-        es_version = version.replaceAll(/\.[0-9]+(|-SNAPSHOT)$/, "")
+
+        plugin_version = version
+        opensearch_version = plugin_version.replaceAll(/\.[0-9]+(|-SNAPSHOT)$/, "")
+
+        versions = [
+                "opensearch": opensearch_version,
+                "prometheus": "0.14.1"
+        ]
     }
 
     repositories {
         mavenLocal()
+        maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
         mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
         jcenter()
     }
 
     dependencies {
-        classpath "org.elasticsearch.gradle:build-tools:${es_version}"
-        classpath group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-        classpath group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0'
-        classpath group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0'
-        classpath group: 'javax.activation', name: 'activation', version: '1.1.1'
+        classpath   "org.opensearch.gradle:build-tools:${versions.opensearch}"
     }
 }
-
-plugins {
-    id "java"
-    id "checkstyle"
-    id "co.riiid.gradle" version "0.4.2"
-}
-
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'elasticsearch.esplugin'
-apply plugin: 'elasticsearch.rest-resources'
-apply plugin: 'elasticsearch.testclusters'
-
-// Uncomment if you want to use: System.out.println("Emergency!");
-// Logs are found in build/testcluster/integTest-*/logs/ folder.
-//forbiddenApis {
-//    ignoreFailures = true
-//}
-
-// license of this project
-licenseFile = rootProject.file('LICENSE.txt')
-// copyright notices
-noticeFile = rootProject.file('NOTICE.txt')
-
-// POM validation can be enabled
-validateNebulaPom.enabled = false
-
-// No unit tests in this plugin
-test.enabled = false
-
-println "Host: " + java.net.InetAddress.getLocalHost()
-println "Gradle: " + gradle.gradleVersion + " JVM: " + org.gradle.internal.jvm.Jvm.current() + " Groovy: " + GroovySystem.getVersion()
-println "Build: group: '${project.group}', name: '${project.name}', version: '${project.version}'"
-println "Timestamp: " + java.time.Instant.now().atZone(java.time.ZoneId.systemDefault()).toString()
 
 repositories {
-    mavenCentral()
     mavenLocal()
-}
-
-ext {
-    versions = [
-        "elasticsearch": es_version,
-        "prometheus"   : "0.8.0",
-        "log4j"        : "2.11.1",
-        "junit"        : "4.12"
-    ]
-}
-
-configurations {
-    releaseJars {
-        extendsFrom runtime
-        exclude group: "org.elasticsearch"
-        exclude group: "com.fasterxml.jackson.core", module: "jackson-core"
-        exclude group: "org.apache.logging.log4j"
-    }
+    maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
+    mavenCentral()
+    maven { url "https://plugins.gradle.org/m2/" }
+    jcenter()
 }
 
 dependencies {
-    compile "org.elasticsearch:elasticsearch:${versions.elasticsearch}"
-    compile "io.prometheus:simpleclient:${versions.prometheus}"
-    compile "io.prometheus:simpleclient_common:${versions.prometheus}"
-    compile "org.apache.logging.log4j:log4j-api:${versions.log4j}"
-    testCompile (group: 'junit', name: 'junit', version: "${versions.junit}") {
-        exclude group:'org.hamcrest' //also included in ES test framework
-    }
-    releaseJars "${project.group}:${project.name}:${project.version}"
+// Deprecated in Gradle 6.8.1, use "implementation" instead
+// See https://docs.gradle.org/6.8.1/userguide/java_plugin.html#sec:java_plugin_and_dependency_management
+//    compile "io.prometheus:simpleclient:${versions.prometheus}"
+//    compile "io.prometheus:simpleclient_common:${versions.prometheus}"
+    implementation group: 'io.prometheus', name: 'simpleclient', version: '0.14.1'
+    implementation group: 'io.prometheus', name: 'simpleclient_common', version: '0.14.1'
 }
 
-tasks.withType(JavaCompile) {
-    options.compilerArgs << "-Xlint:unchecked,deprecation"
+test {
+    include '**/*Tests.class'
 }
 
-esplugin {
-    licenseFile rootProject.file('LICENSE.txt')
-    noticeFile rootProject.file('NOTICE.txt')
-    name pluginName
-    description pluginDescription
-    classname pluginClassname
+task integTest(type: RestIntegTestTask) {
+    description = "Run tests against a cluster"
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
 }
+tasks.named("check").configure { dependsOn(integTest) }
 
-restResources {
-  restApi {
-    includeCore '*'
-  }
-}
+// Temporary disable task :testingConventions
+//testingConventions.enabled = false
 
 testClusters.all {
     numberOfNodes = 2
 
-// There does not seem to be any easy way how to setup custom cluster name.
-
-//    This worked in ES 7.4.x, but now results in:
-//    A problem occurred evaluating root project 'prometheus-exporter'.
-//    > Cannot set the property 'clusterName' because the backing field is final.
-//    clusterName = "PrometheusExporterITCluster"
-
-//    This does not work in ES 7.5.x too:
-//    Execution failed for task ':integTestRunner'.
-//    > Testclusters does not allow the following settings to be changed:[cluster.name] for node{::integTest-0}
-//    setting 'cluster.name', 'PrometheusExporterITCluster'
+    // It seems cluster name can not be customized here. It gives an error:
+    // Testclusters does not allow the following settings to be changed:[cluster.name] for node{::yamlRestTest-0}
+    // setting 'cluster.name', 'PrometheusExporterITCluster'
 }
 
-checkstyle {
-    configFile = new File(rootDir, "checkstyle.xml")
-    toolVersion = "8.2"
-}
-
-def getGitCommitHash() {
-    def gitFolderPath = "$projectDir/.git/"
-    def gitFolder = new File(gitFolderPath + "HEAD");
-    if (!gitFolder.exists()) {
-        return null
+integTest {
+    // The --debug-jvm command-line option makes the cluster debuggable; this makes the tests debuggable
+    if (System.getProperty("test.debug") != null) {
+        jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005'
     }
-
-    def head = gitFolder.text.split(":")
-    def isCommit = (head.length == 1)
-
-    if (isCommit) {
-        return head[0].trim()
-    }
-
-    def refHead = new File(gitFolderPath + head[1].trim())
-    return refHead.text.trim()
 }
 
-github {
-    owner = github_owner
-    repo = github_repo
-    token = github_token
-    tagName = version
-    targetCommitish = getGitCommitHash()
-    name = version
-    assets = [
-        "build/distributions/${project.name}-${version}.zip"
-    ]
+testClusters.integTest {
+    testDistribution = "INTEG_TEST"
+
+    // This installs our plugin into the testClusters
+    plugin(project.tasks.bundlePlugin.archiveFile)
 }
 
-task release() {
-    if (version.endsWith("-SNAPSHOT")) {
-        doLast {
-            println("SNAPSHOT: Nothing to release !")
-        }
-    } else {
-        dependsOn(["githubRelease"])
-    }
+run {
+    useCluster testClusters.integTest
 }
