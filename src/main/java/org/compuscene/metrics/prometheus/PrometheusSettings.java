@@ -17,9 +17,9 @@
 
 package org.compuscene.metrics.prometheus;
 
-import org.elasticsearch.common.settings.ClusterSettings;
-import org.elasticsearch.common.settings.Setting;
-import org.elasticsearch.common.settings.Settings;
+import org.opensearch.common.settings.ClusterSettings;
+import org.opensearch.common.settings.Setting;
+import org.opensearch.common.settings.Settings;
 
 /**
  * A container to keep settings for prometheus up to date with cluster setting changes.
@@ -29,11 +29,8 @@ import org.elasticsearch.common.settings.Settings;
  */
 public class PrometheusSettings {
 
-    // These settings become part of cluster state available via HTTP at
-    // curl <elasticsearch>/_cluster/settings?include_defaults=true&filter_path=defaults.prometheus
-    // It is important to keep it under reasonable namespace to avoid collision with
-    // other plugins or future/commercial parts of Elastic Stack itself.
-    // Namespace "prometheus" sounds like safe bet for now.
+    // These settings are part of cluster state available via HTTP at
+    // curl <opensearch>/_cluster/settings?include_defaults=true&filter_path=defaults.prometheus
     public static final Setting<Boolean> PROMETHEUS_CLUSTER_SETTINGS =
             Setting.boolSetting("prometheus.cluster.settings", true,
                     Setting.Property.Dynamic, Setting.Property.NodeScope);

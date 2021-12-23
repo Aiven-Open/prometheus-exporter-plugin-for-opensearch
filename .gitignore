@@ -2,22 +2,59 @@
 # https://discuss.elastic.co/t/leftovers-after-integtestrunner-in-root/152610
 \.local*-integTestRunner-execution-times.log
 
-# Eclipse
-.classpath
-.project
-.settings/
-
-# Intellij
+# intellij files
 .idea/
 *.iml
-*.iws
 *.ipr
+*.iws
+build-idea/
+out/
 
-# Gradle
-.gradle
-build
-gradle-wrapper.jar
-gradle-wrapper.properties
+# include shared intellij config
+!.idea/inspectionProfiles/Project_Default.xml
+!.idea/runConfigurations/Debug_OpenSearch.xml
 
-# Mac
+# These files are generated in the main tree by IntelliJ
+benchmarks/src/main/generated/*
+
+# eclipse files
+.project
+.classpath
+.settings
+build-eclipse/
+
+# netbeans files
+nb-configuration.xml
+nbactions.xml
+
+# gradle stuff
+.gradle/
+build/
+
+# vscode stuff
+.vscode/
+
+# testing stuff
+**/.local*
+.vagrant/
+/logs/
+
+# osx stuff
 .DS_Store
+
+# default folders in which the create_bwc_index.py expects to find old es versions in
+/backwards
+/dev-tools/backwards
+
+# needed in case docs build is run...maybe we can configure doc build to generate files under build?
+html_docs
+
+# random old stuff that we should look at the necessity of...
+/tmp/
+eclipse-build
+
+# projects using testfixtures
+testfixtures_shared/
+
+# These are generated from .ci/jobs.t
+.ci/jobs/

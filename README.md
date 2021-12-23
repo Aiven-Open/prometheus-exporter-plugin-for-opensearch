@@ -1,9 +1,8 @@
-![CI](https://github.com/vvanholl/elasticsearch-prometheus-exporter/workflows/CI/badge.svg?branch=master)
+# Prometheus Exporter Plugin for OpenSearch
 
-# Prometheus Exporter Plugin for Elasticsearch
+The [Prometheus exporter](https://prometheus.io/docs/instrumenting/writing_exporters/) plugin for OpenSearch exposes many OpenSearch metrics in [Prometheus format](https://prometheus.io/docs/instrumenting/exposition_formats/).
 
-This is a builtin exporter from Elasticsearch to Prometheus.
-It collects all relevant metrics and makes them available to Prometheus via the Elasticsearch REST API.
+This plugin is based on [Prometheus exporter for Elasticsearch](https://github.com/vvanholl/elasticsearch-prometheus-exporter) and all the great work the community has done. The Elasticsearch plugin was forked in version 7.10.2.0 (commit hash: [8dc7f85](https://github.com/vvanholl/elasticsearch-prometheus-exporter/commit/8dc7f85109fe1601a68010e9de598a9b131afd02)) which is the latest when Elasticsearch was still using AL2.
 
 **Currently, the available metrics are:**
 
@@ -19,58 +18,25 @@ It collects all relevant metrics and makes them available to Prometheus via the 
     - File System
     - Circuit Breaker
 - Indices status
-- Cluster settings (selected [disk allocation settings](https://www.elastic.co/guide/en/elasticsearch/reference/master/disk-allocator.html) only)
+- Cluster settings (notably [disk watermarks](https://opensearch.org/docs/latest/opensearch/popular-api/#change-disk-watermarks-or-other-cluster-settings) that can be updated dynamically)
 
 ## Compatibility matrix
 
-### Version 7.X
-
-| Elasticsearch  | Plugin         | Release date |
-| -------------- | -------------- | ------------ |
-| 7.12.0         | 7.12.0.0       | Apr 04, 2021 |
-| 7.11.2         | 7.11.2.0       | Mar 20, 2021 |
-| 7.11.1         | 7.11.1.0       | Feb 22, 2021 |
-| 7.10.2         | 7.10.2.0       | Jan 24, 2021 |
-| 7.10.1         | 7.10.1.0       | Dec 13, 2020 |
-| 7.10.0         | 7.10.0.0       | Nov 15, 2020 |
-| 7.9.3          | 7.9.3.0        | Oct 22, 2020 |
-| 7.9.2          | 7.9.2.0        | Oct 04, 2020 |
-| 7.9.1          | 7.9.1.0        | Sep 06, 2020 |
-| 7.9.0          | 7.9.0.0        | Aug 18, 2020 |
-| 7.8.1          | 7.8.1.0        | Aug 10, 2020 |
-| 7.8.0          | 7.8.0.0        | Jun 22, 2020 |
-| 7.7.1          | 7.7.1.0        | Jun 04, 2020 |
-| 7.7.0          | 7.7.0.0        | May 14, 2020 |
-| 7.6.2          | 7.6.2.0        | Apr  6, 2020 |
-| 7.6.1          | 7.6.1.0        | Mar 30, 2020 |
-| 7.6.0          | 7.6.0.0        | Feb 12, 2020 |
-| 7.5.2          | 7.5.2.0        | Jan 25, 2020 |
-| 7.5.1          | 7.5.1.0        | Jan 21, 2020 |
-| 7.5.0          | 7.5.0.0        | Jan 16, 2020 |
-| 7.4.2          | 7.4.2.0        | Jan 13, 2020 |
-| 7.4.1          | 7.4.1.0        | Jan 13, 2020 |
-| 7.4.0          | 7.4.0.0        | Jan 07, 2020 |
-| 7.3.2          | 7.3.2.0        | Oct 05, 2019 |
-| 7.3.1          | 7.3.1.0        | Sep 18, 2019 |
-| 7.3.0          | 7.3.0.0        | Sep 17, 2019 |
-| 7.2.1          | 7.2.1.0        | Jul 31, 2019 |
-| 7.2.0          | 7.2.0.0        | Jul 12, 2019 |
-| 7.1.1          | 7.1.1.0        | May 31, 2019 |
-| 7.1.0          | 7.1.0.0        | May 23, 2019 |
-| 7.0.1          | 7.0.1.0        | May 08, 2019 |
-| 7.0.0          | 7.0.0.0        | Apr 11, 2019 |
+| OpenSearch | Plugin   | Release date    |
+|------------|----------|-----------------|
+| 1.2.3      | 1.2.3.0  | TBD |
 
 ## Install
 
-`./bin/elasticsearch-plugin install -b https://github.com/vvanholl/elasticsearch-prometheus-exporter/releases/download/7.12.0.0/prometheus-exporter-7.12.0.0.zip`
+Before you start OpenSearch cluster install the plugin on each cluster node that will be scraped by Prometheus:
 
-**Do not forget to restart the node after the installation!**
+_Notice: the URL location is temporary for now._ 
 
-Note that the plugin needs the following special permissions:
+`./bin/opensearch-plugin install https://github.com/TBD/prometheus-exporter/releases/download/1.2.3.0/prometheus-exporter-1.2.3.0.zip`
 
-- java.lang.RuntimePermission accessClassInPackage.sun.misc
-- java.lang.RuntimePermission accessDeclaredMembers
-- java.lang.reflect.ReflectPermission suppressAccessChecks
+Start OpenSearch cluster.
+
+## Plugin configuration
 
 If you have a lot of indices and think this data is irrelevant, you can disable in the main configuration file:
 
@@ -83,19 +49,21 @@ To disable exporting cluster settings use:
 prometheus.cluster.settings: false
 ```
 
-These settings can be also [updated dynamically](https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster-update-settings.html).
+These settings can be also [updated dynamically](https://opensearch.org/docs/latest/opensearch/configuration/#update-cluster-settings-using-the-api).
 
 ## Uninstall
 
+You need to remove the plugin from all nodes where it was installed.
+
 `./bin/elasticsearch-plugin remove prometheus-exporter`
 
-Do not forget to restart the node after installation!
+Do not forget to restart the node after installation.
 
 ## Usage
 
 Metrics are directly available at:
 
-    http://<your-elasticsearch-host>:9200/_prometheus/metrics
+    http(s)://<your-opensearch-host>:9200/_prometheus/metrics
 
 As a sample result, you get:
 
@@ -119,7 +87,6 @@ es_indices_search_open_contexts_number{cluster="develop",node="develop01",} 0.0
 # HELP es_jvm_mem_nonheap_used_bytes Memory used apart from heap
 # TYPE es_jvm_mem_nonheap_used_bytes gauge
 es_jvm_mem_nonheap_used_bytes{cluster="develop",node="develop01",} 5.5302736E7
-
 ...
 ```
 
@@ -130,7 +97,7 @@ On your Prometheus servers, configure a new job as usual.
 For example, if you have a cluster of 3 nodes:
 
 ```YAML
-- job_name: elasticsearch
+- job_name: opensearch
   scrape_interval: 10s
   metrics_path: "/_prometheus/metrics"
   static_configs:
@@ -144,33 +111,22 @@ Of course, you could use the service discovery service instead of a static confi
 
 Just keep in mind that `metrics_path` must be `/_prometheus/metrics`, otherwise Prometheus will find no metric.
 
-## Project sources
-
-The Maven project site is available at [GitHub](https://github.com/vvanholl/elasticsearch-prometheus-exporter).
-
 ## Testing
 
 Project contains [integration tests](src/test/resources/rest-api-spec) implemented using
-[rest layer](https://github.com/elastic/elasticsearch/blob/master/TESTING.asciidoc#testing-the-rest-layer)
+[rest layer](https://github.com/opensearch-project/OpenSearch/blob/main/TESTING.md#testing-the-rest-layer)
 framework.
-
-To run everything similar to the gitlab pipeline you can do:
-```
-docker run -v $(pwd):/home/gradle gradle:6.6.0-jdk14 su gradle -c 'gradle check'
-```
-NOTE: Please keep version in sync with .gitlab-ci.yml
-
 
 Complete test suite is run using:
 ```
-gradle clean check
+./gradlew clean check
 ```
 
-To run individual test file use:
+To run individual integration rest test file use:
 ```
-gradle :integTest \
-  -Dtests.class=org.elasticsearch.rest.PrometheusRestHandlerClientYamlTestSuiteIT \
-  -Dtests.method="test {yaml=resthandler/20_metrics/Prometheus metrics can be pulled}"
+./gradlew :yamlRestTest \
+  -Dtests.class=org.opensearch.plugin.prometheus.PrometheusRestHandlerClientYamlTestSuiteIT \
+  -Dtests.method="test {yaml=test/20_metrics/Prometheus metrics can be pulled}"
 ```
 
 ## Credits

@@ -17,26 +17,26 @@
 
 package org.compuscene.metrics.prometheus;
 
-import org.elasticsearch.action.ClusterStatsData;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
-import org.elasticsearch.action.admin.indices.stats.CommonStats;
-import org.elasticsearch.action.admin.indices.stats.IndexStats;
-import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
-import org.elasticsearch.cluster.health.ClusterIndexHealth;
-import org.elasticsearch.cluster.node.DiscoveryNodeRole;
-import org.elasticsearch.http.HttpStats;
-import org.elasticsearch.indices.NodeIndicesStats;
-import org.elasticsearch.indices.breaker.AllCircuitBreakerStats;
-import org.elasticsearch.indices.breaker.CircuitBreakerStats;
-import org.elasticsearch.ingest.IngestStats;
-import org.elasticsearch.monitor.fs.FsInfo;
-import org.elasticsearch.monitor.jvm.JvmStats;
-import org.elasticsearch.monitor.os.OsStats;
-import org.elasticsearch.monitor.process.ProcessStats;
-import org.elasticsearch.script.ScriptStats;
-import org.elasticsearch.threadpool.ThreadPoolStats;
-import org.elasticsearch.transport.TransportStats;
+import org.opensearch.action.ClusterStatsData;
+import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.opensearch.action.admin.cluster.node.stats.NodeStats;
+import org.opensearch.action.admin.indices.stats.CommonStats;
+import org.opensearch.action.admin.indices.stats.IndexStats;
+import org.opensearch.action.admin.indices.stats.IndicesStatsResponse;
+import org.opensearch.cluster.health.ClusterIndexHealth;
+import org.opensearch.cluster.node.DiscoveryNodeRole;
+import org.opensearch.http.HttpStats;
+import org.opensearch.indices.NodeIndicesStats;
+import org.opensearch.indices.breaker.AllCircuitBreakerStats;
+import org.opensearch.indices.breaker.CircuitBreakerStats;
+import org.opensearch.ingest.IngestStats;
+import org.opensearch.monitor.fs.FsInfo;
+import org.opensearch.monitor.jvm.JvmStats;
+import org.opensearch.monitor.os.OsStats;
+import org.opensearch.monitor.process.ProcessStats;
+import org.opensearch.script.ScriptStats;
+import org.opensearch.threadpool.ThreadPoolStats;
+import org.opensearch.transport.TransportStats;
 
 import java.util.HashMap;
 import java.util.List;
