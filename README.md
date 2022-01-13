@@ -22,9 +22,9 @@ This plugin is based on [Prometheus exporter for Elasticsearch](https://github.c
 
 ## Compatibility matrix
 
-| OpenSearch | Plugin   | Release date    |
-|------------|----------|-----------------|
-| 1.2.3      | 1.2.3.0  | TBD |
+|  OpenSearch |   Plugin |  Release date |
+|------------:|---------:|--------------:|
+|       1.2.3 |  1.2.3.0 |           TBD |
 
 ## Install
 
@@ -113,7 +113,7 @@ Just keep in mind that `metrics_path` must be `/_prometheus/metrics`, otherwise 
 
 ## Testing
 
-Project contains [integration tests](src/test/resources/rest-api-spec) implemented using
+Project contains [integration tests](src/yamlRestTest/resources/rest-api-spec) implemented using
 [rest layer](https://github.com/opensearch-project/OpenSearch/blob/main/TESTING.md#testing-the-rest-layer)
 framework.
 
@@ -125,8 +125,7 @@ Complete test suite is run using:
 To run individual integration rest test file use:
 ```
 ./gradlew :yamlRestTest \
-  -Dtests.class=org.opensearch.plugin.prometheus.PrometheusRestHandlerClientYamlTestSuiteIT \
-  -Dtests.method="test {yaml=test/20_metrics/Prometheus metrics can be pulled}"
+  -Dtests.method="test {yaml=/20_11_index_level_metrics_disabled/Dynamically disable index level metrics}"
 ```
 
 ## Credits
