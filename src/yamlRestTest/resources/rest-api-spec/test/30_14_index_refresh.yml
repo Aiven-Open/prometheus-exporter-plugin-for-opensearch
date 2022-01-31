@@ -29,10 +29,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_refresh_total_count (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_refresh_total_count \s gauge \n
+        \# \s HELP \s opensearch_index_refresh_total_count (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_refresh_total_count \s gauge \n
         (
-          es_index_refresh_total_count\{
+          opensearch_index_refresh_total_count\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}
@@ -41,10 +41,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_refresh_total_time_seconds (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_refresh_total_time_seconds \s gauge \n
+        \# \s HELP \s opensearch_index_refresh_total_time_seconds (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_refresh_total_time_seconds \s gauge \n
         (
-          es_index_refresh_total_time_seconds\{
+          opensearch_index_refresh_total_time_seconds\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}
@@ -53,10 +53,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_refresh_listeners_number (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_refresh_listeners_number \s gauge \n
+        \# \s HELP \s opensearch_index_refresh_listeners_number (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_refresh_listeners_number \s gauge \n
         (
-          es_index_refresh_listeners_number\{
+          opensearch_index_refresh_listeners_number\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}

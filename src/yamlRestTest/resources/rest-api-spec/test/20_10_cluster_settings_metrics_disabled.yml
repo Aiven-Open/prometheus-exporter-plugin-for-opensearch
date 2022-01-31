@@ -21,9 +21,9 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_threshold_enabled \s gauge \n
-        es_cluster_routing_allocation_disk_threshold_enabled\{
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_threshold_enabled \s gauge \n
+        opensearch_cluster_routing_allocation_disk_threshold_enabled\{
             cluster="yamlRestTest"
         \,} \s 1\.0 \n?
         .*/
@@ -54,8 +54,8 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_threshold_enabled \s gauge
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_threshold_enabled \s gauge
         (\n \# \s (HELP|TYPE).* | \s*)
         /
 
@@ -65,8 +65,8 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_threshold_enabled \s gauge
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_threshold_enabled \s gauge
         (\n \# \s (HELP|TYPE).* | \s*)
         /
 
@@ -94,8 +94,8 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_threshold_enabled \s gauge
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_threshold_enabled \s gauge
         (\n \# \s (HELP|TYPE).* | \s*)
         /
 
@@ -123,8 +123,8 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_threshold_enabled \s gauge
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_threshold_enabled \s gauge
         (\n \# \s (HELP|TYPE).* | \s*)
         /
 
@@ -150,9 +150,9 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_threshold_enabled \s gauge \n
-        es_cluster_routing_allocation_disk_threshold_enabled\{
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_threshold_enabled (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_threshold_enabled \s gauge \n
+        opensearch_cluster_routing_allocation_disk_threshold_enabled\{
             cluster="yamlRestTest"
         \,} \s 1\.0 \n?
         .*/

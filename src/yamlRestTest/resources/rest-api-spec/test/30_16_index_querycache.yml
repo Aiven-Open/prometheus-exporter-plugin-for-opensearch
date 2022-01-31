@@ -29,10 +29,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_querycache_cache_count (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_querycache_cache_count \s gauge \n
+        \# \s HELP \s opensearch_index_querycache_cache_count (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_querycache_cache_count \s gauge \n
         (
-          es_index_querycache_cache_count\{
+          opensearch_index_querycache_cache_count\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}
@@ -41,10 +41,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_querycache_cache_size_bytes (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_querycache_cache_size_bytes \s gauge \n
+        \# \s HELP \s opensearch_index_querycache_cache_size_bytes (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_querycache_cache_size_bytes \s gauge \n
         (
-          es_index_querycache_cache_size_bytes\{
+          opensearch_index_querycache_cache_size_bytes\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}
@@ -53,10 +53,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_querycache_evictions_count (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_querycache_evictions_count \s gauge \n
+        \# \s HELP \s opensearch_index_querycache_evictions_count (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_querycache_evictions_count \s gauge \n
         (
-          es_index_querycache_evictions_count\{
+          opensearch_index_querycache_evictions_count\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}
@@ -65,10 +65,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_querycache_hit_count (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_querycache_hit_count \s gauge \n
+        \# \s HELP \s opensearch_index_querycache_hit_count (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_querycache_hit_count \s gauge \n
         (
-          es_index_querycache_hit_count\{
+          opensearch_index_querycache_hit_count\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}
@@ -77,10 +77,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_querycache_memory_size_bytes (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_querycache_memory_size_bytes \s gauge \n
+        \# \s HELP \s opensearch_index_querycache_memory_size_bytes (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_querycache_memory_size_bytes \s gauge \n
         (
-          es_index_querycache_memory_size_bytes\{
+          opensearch_index_querycache_memory_size_bytes\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}
@@ -89,10 +89,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_querycache_miss_number (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_querycache_miss_number \s gauge \n
+        \# \s HELP \s opensearch_index_querycache_miss_number (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_querycache_miss_number \s gauge \n
         (
-          es_index_querycache_miss_number\{
+          opensearch_index_querycache_miss_number\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}
@@ -101,10 +101,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_querycache_total_number (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_querycache_total_number \s gauge \n
+        \# \s HELP \s opensearch_index_querycache_total_number (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_querycache_total_number \s gauge \n
         (
-          es_index_querycache_total_number\{
+          opensearch_index_querycache_total_number\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}

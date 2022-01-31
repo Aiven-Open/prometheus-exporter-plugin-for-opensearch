@@ -38,24 +38,42 @@ Start OpenSearch cluster.
 
 ## Plugin configuration
 
-If you have a lot of indices and think this data is irrelevant, you can disable in the main configuration file:
+### Static settings
+
+#### Metric name prefix
+
+All metric names share common prefix, by default set to `opensearch_`.
+
+The value of this prefix can be customized using setting:
+```
+prometheus.metric_name.prefix: "opensearch_"
+```
+
+### Dynamic settings
+
+#### Index level metrics
+
+Detailed index level metrics can represent a lot of data and can lead to high-cardinality labels in Prometheus.
+If you do not need detailed index level metrics it is recommended to disable it via setting:
 
 ```
 prometheus.indices: false
 ```
+
+#### Cluster settings
 
 To disable exporting cluster settings use:
 ```
 prometheus.cluster.settings: false
 ```
 
-These settings can be also [updated dynamically](https://opensearch.org/docs/latest/opensearch/configuration/#update-cluster-settings-using-the-api).
+Both these settings can be [updated dynamically](https://opensearch.org/docs/latest/opensearch/configuration/#update-cluster-settings-using-the-api).
 
 ## Uninstall
 
 You need to remove the plugin from all nodes where it was installed.
 
-`./bin/elasticsearch-plugin remove prometheus-exporter`
+`./bin/opensearch-plugin remove prometheus-exporter`
 
 Do not forget to restart the node after installation.
 
@@ -63,30 +81,30 @@ Do not forget to restart the node after installation.
 
 Metrics are directly available at:
 
-    http(s)://<your-opensearch-host>:9200/_prometheus/metrics
+    http(s)://<opensearch-host>:9200/_prometheus/metrics
 
 As a sample result, you get:
 
 ```
-# HELP es_process_mem_total_virtual_bytes Memory used by ES process
-# TYPE es_process_mem_total_virtual_bytes gauge
-es_process_mem_total_virtual_bytes{cluster="develop",node="develop01",} 3.626733568E9
-# HELP es_indices_indexing_is_throttled_bool Is indexing throttling ?
-# TYPE es_indices_indexing_is_throttled_bool gauge
-es_indices_indexing_is_throttled_bool{cluster="develop",node="develop01",} 0.0
-# HELP es_jvm_gc_collection_time_seconds Time spent for GC collections
-# TYPE es_jvm_gc_collection_time_seconds counter
-es_jvm_gc_collection_time_seconds{cluster="develop",node="develop01",gc="old",} 0.0
-es_jvm_gc_collection_time_seconds{cluster="develop",node="develop01",gc="young",} 0.0
-# HELP es_indices_requestcache_memory_size_bytes Memory used for request cache
-# TYPE es_indices_requestcache_memory_size_bytes gauge
-es_indices_requestcache_memory_size_bytes{cluster="develop",node="develop01",} 0.0
-# HELP es_indices_search_open_contexts_number Number of search open contexts
-# TYPE es_indices_search_open_contexts_number gauge
-es_indices_search_open_contexts_number{cluster="develop",node="develop01",} 0.0
-# HELP es_jvm_mem_nonheap_used_bytes Memory used apart from heap
-# TYPE es_jvm_mem_nonheap_used_bytes gauge
-es_jvm_mem_nonheap_used_bytes{cluster="develop",node="develop01",} 5.5302736E7
+# HELP opensearch_process_mem_total_virtual_bytes Memory used by ES process
+# TYPE opensearch_process_mem_total_virtual_bytes gauge
+opensearch_process_mem_total_virtual_bytes{cluster="develop",node="develop01",} 3.626733568E9
+# HELP opensearch_indices_indexing_is_throttled_bool Is indexing throttling ?
+# TYPE opensearch_indices_indexing_is_throttled_bool gauge
+opensearch_indices_indexing_is_throttled_bool{cluster="develop",node="develop01",} 0.0
+# HELP opensearch_jvm_gc_collection_time_seconds Time spent for GC collections
+# TYPE opensearch_jvm_gc_collection_time_seconds counter
+opensearch_jvm_gc_collection_time_seconds{cluster="develop",node="develop01",gc="old",} 0.0
+opensearch_jvm_gc_collection_time_seconds{cluster="develop",node="develop01",gc="young",} 0.0
+# HELP opensearch_indices_requestcache_memory_size_bytes Memory used for request cache
+# TYPE opensearch_indices_requestcache_memory_size_bytes gauge
+opensearch_indices_requestcache_memory_size_bytes{cluster="develop",node="develop01",} 0.0
+# HELP opensearch_indices_search_open_contexts_number Number of search open contexts
+# TYPE opensearch_indices_search_open_contexts_number gauge
+opensearch_indices_search_open_contexts_number{cluster="develop",node="develop01",} 0.0
+# HELP opensearch_jvm_mem_nonheap_used_bytes Memory used apart from heap
+# TYPE opensearch_jvm_mem_nonheap_used_bytes gauge
+opensearch_jvm_mem_nonheap_used_bytes{cluster="develop",node="develop01",} 5.5302736E7
 ...
 ```
 

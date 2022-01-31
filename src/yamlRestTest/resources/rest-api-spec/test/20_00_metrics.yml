@@ -17,10 +17,10 @@
 
   - match:
       $body: |
-               /.* es_indices_segments_memory_bytes .*/
+               /.* opensearch_indices_segments_memory_bytes .*/
 
   - match:
-      $body: /# HELP es_os_swap_total_bytes Total swap size\n# TYPE es_os_swap_total_bytes gauge\n.*/
+      $body: /# HELP opensearch_os_swap_total_bytes Total swap size\n# TYPE opensearch_os_swap_total_bytes gauge\n.*/
 
 
 #---

@@ -25,7 +25,7 @@ import org.opensearch.common.settings.Settings;
  * A container to keep settings for prometheus up to date with cluster setting changes.
  *
  * In order to make the settings dynamically updatable we took some inspiration from implementation
- * and use of DiskThresholdSettings class in Elasticsearch.
+ * and use of DiskThresholdSettings class in OpenSearch.
  */
 public class PrometheusSettings {
 
