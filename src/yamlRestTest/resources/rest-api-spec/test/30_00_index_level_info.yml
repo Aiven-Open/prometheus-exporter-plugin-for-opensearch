@@ -29,10 +29,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_shards_number (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_shards_number \s gauge \n
+        \# \s HELP \s opensearch_index_shards_number (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_shards_number \s gauge \n
         (
-          es_index_shards_number\{
+          opensearch_index_shards_number\{
               cluster="yamlRestTest",
               type="(active_primary|initializing|relocating|shards|active|unassigned)",
               index="twitter"
@@ -43,9 +43,9 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_status (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_status \s gauge \n
-        es_index_status\{
+        \# \s HELP \s opensearch_index_status (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_status \s gauge \n
+        opensearch_index_status\{
             cluster="yamlRestTest",index="twitter"
         \,} \s \d+\.\d+ \n?
         .*/
@@ -53,9 +53,9 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_replicas_number (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_replicas_number \s gauge \n
-        es_index_replicas_number\{
+        \# \s HELP \s opensearch_index_replicas_number (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_replicas_number \s gauge \n
+        opensearch_index_replicas_number\{
             cluster="yamlRestTest",index="twitter"
         ,\} \s+ \d+\.\d+ \n?
         .*/
@@ -91,10 +91,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_doc_number (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_doc_number \s gauge \n
+        \# \s HELP \s opensearch_index_doc_number (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_doc_number \s gauge \n
         (
-          es_index_doc_number\{
+          opensearch_index_doc_number\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}
@@ -103,10 +103,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_doc_deleted_number (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_doc_deleted_number \s gauge \n
+        \# \s HELP \s opensearch_index_doc_deleted_number (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_doc_deleted_number \s gauge \n
         (
-          es_index_doc_deleted_number\{
+          opensearch_index_doc_deleted_number\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}
@@ -115,10 +115,10 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_index_store_size_bytes (\s|\w|\d)+ \n
-        \# \s TYPE \s es_index_store_size_bytes \s gauge \n
+        \# \s HELP \s opensearch_index_store_size_bytes (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_index_store_size_bytes \s gauge \n
         (
-          es_index_store_size_bytes\{
+          opensearch_index_store_size_bytes\{
               cluster="yamlRestTest",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
         ){2}

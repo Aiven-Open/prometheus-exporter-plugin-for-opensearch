@@ -25,9 +25,9 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_low_bytes (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_low_bytes \s gauge \n
-        es_cluster_routing_allocation_disk_watermark_low_bytes\{
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_low_bytes (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_low_bytes \s gauge \n
+        opensearch_cluster_routing_allocation_disk_watermark_low_bytes\{
             cluster="yamlRestTest"
         \,} \s 1\.0 \n?
         .*/
@@ -35,9 +35,9 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_high_bytes (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_high_bytes \s gauge \n
-        es_cluster_routing_allocation_disk_watermark_high_bytes\{
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_high_bytes (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_high_bytes \s gauge \n
+        opensearch_cluster_routing_allocation_disk_watermark_high_bytes\{
             cluster="yamlRestTest"
         \,} \s 1\.0 \n?
         .*/
@@ -45,9 +45,9 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_flood_stage_bytes (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_flood_stage_bytes \s gauge \n
-        es_cluster_routing_allocation_disk_watermark_flood_stage_bytes\{
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_flood_stage_bytes (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_flood_stage_bytes \s gauge \n
+        opensearch_cluster_routing_allocation_disk_watermark_flood_stage_bytes\{
             cluster="yamlRestTest"
         \,} \s 1\.0 \n?
         .*/
@@ -66,24 +66,24 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_low_pct (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_low_pct \s gauge
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_low_pct (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_low_pct \s gauge
         (\n \# \s (HELP|TYPE).* | \s*)
         /
 
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_high_pct (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_high_pct \s gauge
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_high_pct (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_high_pct \s gauge
         (\n \# \s (HELP|TYPE).* | \s*)
         /
 
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_flood_stage_pct (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_flood_stage_pct \s gauge
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_flood_stage_pct (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_flood_stage_pct \s gauge
         (\n \# \s (HELP|TYPE).* | \s*)
         /
 
@@ -114,9 +114,9 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_low_pct (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_low_pct \s gauge \n
-        es_cluster_routing_allocation_disk_watermark_low_pct\{
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_low_pct (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_low_pct \s gauge \n
+        opensearch_cluster_routing_allocation_disk_watermark_low_pct\{
             cluster="yamlRestTest"
         \,} \s 99\.9 \n?
         .*/
@@ -124,9 +124,9 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_high_pct (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_high_pct \s gauge \n
-        es_cluster_routing_allocation_disk_watermark_high_pct\{
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_high_pct (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_high_pct \s gauge \n
+        opensearch_cluster_routing_allocation_disk_watermark_high_pct\{
             cluster="yamlRestTest"
         \,} \s 99\.9 \n?
         .*/
@@ -134,9 +134,9 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_flood_stage_pct (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_flood_stage_pct \s gauge \n
-        es_cluster_routing_allocation_disk_watermark_flood_stage_pct\{
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_flood_stage_pct (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_flood_stage_pct \s gauge \n
+        opensearch_cluster_routing_allocation_disk_watermark_flood_stage_pct\{
             cluster="yamlRestTest"
         \,} \s 99\.9 \n?
         .*/
@@ -146,24 +146,24 @@
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_low_bytes (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_low_bytes \s gauge
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_low_bytes (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_low_bytes \s gauge
         (\n \# \s (HELP|TYPE).* | \s*)
         /
 
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_high_bytes (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_high_bytes \s gauge
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_high_bytes (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_high_bytes \s gauge
         (\n \# \s (HELP|TYPE).* | \s*)
         /
 
   - match:
       $body: |
         /.*
-        \# \s HELP \s es_cluster_routing_allocation_disk_watermark_flood_stage_bytes (\s|\w|\d)+ \n
-        \# \s TYPE \s es_cluster_routing_allocation_disk_watermark_flood_stage_bytes \s gauge
+        \# \s HELP \s opensearch_cluster_routing_allocation_disk_watermark_flood_stage_bytes (\s|\w|\d)+ \n
+        \# \s TYPE \s opensearch_cluster_routing_allocation_disk_watermark_flood_stage_bytes \s gauge
         (\n \# \s (HELP|TYPE).* | \s*)
         /
 

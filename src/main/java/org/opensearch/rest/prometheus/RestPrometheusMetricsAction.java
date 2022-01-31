@@ -30,6 +30,7 @@ import org.opensearch.action.NodePrometheusMetricsResponse;
 import org.opensearch.client.node.NodeClient;
 import org.opensearch.common.network.NetworkAddress;
 import org.opensearch.common.settings.ClusterSettings;
+import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.rest.*;
 import org.opensearch.rest.action.RestResponseListener;
@@ -45,11 +46,27 @@ import static java.util.Collections.unmodifiableList;
  */
 public class RestPrometheusMetricsAction extends BaseRestHandler {
 
+    static String METRIC_PREFIX_KEY = "prometheus.metric_name.prefix";
+    static Setting.Validator<String> indexPrefixValidator = value -> {
+        if (value == null || value.isEmpty()) {
+            throw new IllegalArgumentException(
+                METRIC_PREFIX_KEY + " value ["+value+"] is not valid"
+            );
+        }
+    };
+    public static final Setting<String> METRIC_PREFIX = Setting.simpleString(METRIC_PREFIX_KEY, "opensearch_", indexPrefixValidator, Setting.Property.NodeScope);
+
+
+    private final String metricPrefix;
     private final PrometheusSettings prometheusSettings;
     private final Logger logger = LogManager.getLogger(getClass());
 
     public RestPrometheusMetricsAction(Settings settings, ClusterSettings clusterSettings) {
         this.prometheusSettings = new PrometheusSettings(settings, clusterSettings);
+        this.metricPrefix = METRIC_PREFIX.get(settings);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Prometheus metric prefix set to [{}]", this.metricPrefix);
+        }
     }
 
     @Override
@@ -88,7 +105,7 @@ public class RestPrometheusMetricsAction extends BaseRestHandler {
                     logger.trace("Prepare new Prometheus metric collector for: [{}], [{}], [{}]", clusterName, nodeId,
                             nodeName);
                 }
-                PrometheusMetricsCatalog catalog = new PrometheusMetricsCatalog(clusterName, nodeName, nodeId, "es_");
+                PrometheusMetricsCatalog catalog = new PrometheusMetricsCatalog(clusterName, nodeName, nodeId, metricPrefix);
                 PrometheusMetricsCollector collector = new PrometheusMetricsCollector(
                         catalog,
                         prometheusSettings.getPrometheusIndices(),
