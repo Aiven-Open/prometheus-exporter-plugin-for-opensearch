@@ -22,9 +22,9 @@ This plugin is based on [Prometheus exporter for Elasticsearch](https://github.c
 
 ## Compatibility matrix
 
-|  OpenSearch |   Plugin |  Release date |
-|------------:|---------:|--------------:|
-|       1.2.3 |  1.2.3.0 |           TBD |
+| OpenSearch |  Plugin | Release date |
+|-----------:|--------:|-------------:|
+|      1.2.4 | 1.2.4.0 |          TBD |
 
 ## Install
 
@@ -32,7 +32,7 @@ Before you start OpenSearch cluster install the plugin on each cluster node that
 
 _Notice: the URL location is temporary for now._ 
 
-`./bin/opensearch-plugin install https://github.com/TBD/prometheus-exporter/releases/download/1.2.3.0/prometheus-exporter-1.2.3.0.zip`
+`./bin/opensearch-plugin install https://github.com/TBD/prometheus-exporter/releases/download/1.2.4.0/prometheus-exporter-1.2.4.0.zip`
 
 Start OpenSearch cluster.
 
@@ -128,6 +128,15 @@ For example, if you have a cluster of 3 nodes:
 Of course, you could use the service discovery service instead of a static config.
 
 Just keep in mind that `metrics_path` must be `/_prometheus/metrics`, otherwise Prometheus will find no metric.
+
+## Build from source
+
+To build the plugin you need JDK 14:
+
+```
+./gradlew clean build
+```
+If you have doubts about the system requirements, please check the [CI.yml](.github/workflows/CI.yml) file for more information.
 
 ## Testing
 
