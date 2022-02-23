@@ -1,8 +1,8 @@
 # Prometheus Exporter Plugin for OpenSearch
 
-The [Prometheus exporter](https://prometheus.io/docs/instrumenting/writing_exporters/) plugin for OpenSearch exposes many OpenSearch metrics in [Prometheus format](https://prometheus.io/docs/instrumenting/exposition_formats/).
+The [Prometheus® exporter](https://prometheus.io/docs/instrumenting/writing_exporters/) plugin for OpenSearch® exposes many OpenSearch metrics in [Prometheus format](https://prometheus.io/docs/instrumenting/exposition_formats/).
 
-This plugin is based on [Prometheus exporter for Elasticsearch](https://github.com/vvanholl/elasticsearch-prometheus-exporter) and all the great work the community has done. The Elasticsearch plugin was forked in version 7.10.2.0 (commit hash: [8dc7f85](https://github.com/vvanholl/elasticsearch-prometheus-exporter/commit/8dc7f85109fe1601a68010e9de598a9b131afd02)) which is the latest when Elasticsearch was still using AL2.
+This plugin is based on [Prometheus exporter for Elasticsearch®](https://github.com/vvanholl/elasticsearch-prometheus-exporter) and all the great work the community has done. The Elasticsearch plugin was forked in version 7.10.2.0 (commit hash: [8dc7f85](https://github.com/vvanholl/elasticsearch-prometheus-exporter/commit/8dc7f85109fe1601a68010e9de598a9b131afd02)) which is the latest when Elasticsearch was still using AL2.
 
 **Currently, the available metrics are:**
 
@@ -172,3 +172,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+## Trademarks & Attributions
+
+Prometheus is a registered trademark of The Linux Foundation. OpenSearch is a registered trademark of Amazon Web Services. Elasticsearch is a registered trademark of Elasticsearch BV.
