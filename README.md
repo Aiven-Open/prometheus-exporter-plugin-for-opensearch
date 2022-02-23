@@ -2,7 +2,7 @@
 
 The [Prometheus® exporter](https://prometheus.io/docs/instrumenting/writing_exporters/) plugin for OpenSearch® exposes many OpenSearch metrics in [Prometheus format](https://prometheus.io/docs/instrumenting/exposition_formats/).
 
-This plugin is based on [Prometheus exporter for Elasticsearch®](https://github.com/vvanholl/elasticsearch-prometheus-exporter) and all the great work the community has done. The Elasticsearch plugin was forked in version 7.10.2.0 (commit hash: [8dc7f85](https://github.com/vvanholl/elasticsearch-prometheus-exporter/commit/8dc7f85109fe1601a68010e9de598a9b131afd02)) which is the latest when Elasticsearch was still using AL2.
+This plugin is based on [Prometheus exporter for Elasticsearch®](https://github.com/vvanholl/elasticsearch-prometheus-exporter) and all the great work the community has done. The plugin was forked in version 7.10.2.0 (commit hash: [8dc7f85](https://github.com/vvanholl/elasticsearch-prometheus-exporter/commit/8dc7f85109fe1601a68010e9de598a9b131afd02)) which is the latest when Elasticsearch was still using AL2 and has been developed independently since then.
 
 **Currently, the available metrics are:**
 
@@ -24,7 +24,12 @@ This plugin is based on [Prometheus exporter for Elasticsearch®](https://github
 
 | OpenSearch |  Plugin | Release date |
 |-----------:|--------:|-------------:|
-|      1.2.4 | 1.2.4.0 |          TBD |
+|      1.3.0 | 1.3.0.0 |          TBD |
+|      1.2.5 | 1.2.5.0 |          TBD |
+|   <= 1.2.4 |     (*) |          (*) |
+
+(*) If you are looking for plugin releases supporting earlier (`<= 1.2.4`) OpenSearch version please visit
+<https://github.com/aparo/opensearch-prometheus-exporter/releases>.
 
 ## Install
 
@@ -32,7 +37,7 @@ Before you start OpenSearch cluster install the plugin on each cluster node that
 
 _Notice: the URL location is temporary for now._ 
 
-`./bin/opensearch-plugin install https://github.com/TBD/prometheus-exporter/releases/download/1.2.4.0/prometheus-exporter-1.2.4.0.zip`
+`./bin/opensearch-plugin install https://github.com/TBD/prometheus-exporter/releases/download/1.3.0.0/prometheus-exporter-1.3.0.0.zip`
 
 Start OpenSearch cluster.
 
