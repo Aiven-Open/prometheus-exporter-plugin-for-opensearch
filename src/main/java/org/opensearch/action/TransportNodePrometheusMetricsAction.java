@@ -23,6 +23,9 @@ import org.compuscene.metrics.prometheus.PrometheusSettings;
 import org.opensearch.OpenSearchException;
 import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.opensearch.action.admin.cluster.node.info.NodesInfoRequest;
+import org.opensearch.action.admin.cluster.node.info.NodesInfoResponse;
+import org.opensearch.action.admin.cluster.node.stats.NodeStats;
 import org.opensearch.action.admin.cluster.node.stats.NodesStatsRequest;
 import org.opensearch.action.admin.cluster.node.stats.NodesStatsResponse;
 import org.opensearch.action.admin.cluster.state.ClusterStateRequest;
@@ -43,7 +46,7 @@ import org.opensearch.transport.TransportService;
 /**
  * Transport action class for Prometheus Exporter plugin.
  *
- * It performs several requests within the cluster to gather "cluster health", "nodes stats", "indices stats"
+ * It performs several requests within the cluster to gather "cluster health", "local nodes info", "nodes stats", "indices stats"
  * and "cluster state" (i.e. cluster settings) info. Some of those requests are optional depending on plugin
  * settings.
  */
@@ -78,18 +81,21 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
         private final ActionListener<NodePrometheusMetricsResponse> listener;
 
         private final ClusterHealthRequest healthRequest;
+        private final NodesInfoRequest localNodesInfoRequest;
         private final NodesStatsRequest nodesStatsRequest;
         private final IndicesStatsRequest indicesStatsRequest;
         private final ClusterStateRequest clusterStateRequest;
 
         private ClusterHealthResponse clusterHealthResponse = null;
+        private NodesInfoResponse localNodesInfoResponse = null;
         private NodesStatsResponse nodesStatsResponse = null;
         private IndicesStatsResponse indicesStatsResponse = null;
         private ClusterStateResponse clusterStateResponse = null;
 
         // read the state of prometheus dynamic settings only once at the beginning of the async request
-        private boolean isPrometheusIndices = prometheusSettings.getPrometheusIndices();
-        private boolean isPrometheusClusterSettings = prometheusSettings.getPrometheusClusterSettings();
+        private final boolean isPrometheusIndices = prometheusSettings.getPrometheusIndices();
+        private final boolean isPrometheusClusterSettings = prometheusSettings.getPrometheusClusterSettings();
+        private final String prometheusNodesFilter = prometheusSettings.getNodesFilter();
 
         // All the requests are executed in sequential non-blocking order.
         // It is implemented by wrapping each individual request with ActionListener
@@ -111,7 +117,10 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
             this.healthRequest = Requests.clusterHealthRequest().local(true);
             this.healthRequest.level(ClusterHealthRequest.Level.SHARDS);
 
-            this.nodesStatsRequest = Requests.nodesStatsRequest("_local").clear().all();
+            // We want to get only the most minimal static info from local node (cluster name, node name and nodeID).
+            this.localNodesInfoRequest = Requests.nodesInfoRequest("_local").clear();
+
+            this.nodesStatsRequest = Requests.nodesStatsRequest(prometheusNodesFilter).clear().all();
 
             // Indices stats request is not "node-specific", it does not support any "_local" notion
             // it is broad-casted to all cluster nodes.
@@ -124,11 +133,11 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
         }
 
         private void gatherRequests() {
-            listener.onResponse(buildResponse(clusterHealthResponse, nodesStatsResponse, indicesStatsResponse,
+            listener.onResponse(buildResponse(clusterHealthResponse, localNodesInfoResponse, nodesStatsResponse, indicesStatsResponse,
                     clusterStateResponse));
         }
 
-        private ActionListener<ClusterStateResponse> clusterStateResponseActionListener =
+        private final ActionListener<ClusterStateResponse> clusterStateResponseActionListener =
             new ActionListener<ClusterStateResponse>() {
                 @Override
                 public void onResponse(ClusterStateResponse response) {
@@ -142,7 +151,7 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
                 }
             };
 
-        private ActionListener<IndicesStatsResponse> indicesStatsResponseActionListener =
+        private final ActionListener<IndicesStatsResponse> indicesStatsResponseActionListener =
             new ActionListener<IndicesStatsResponse>() {
                 @Override
                 public void onResponse(IndicesStatsResponse response) {
@@ -160,7 +169,7 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
                 }
             };
 
-        private ActionListener<NodesStatsResponse> nodesStatsResponseActionListener =
+        private final ActionListener<NodesStatsResponse> nodesStatsResponseActionListener =
             new ActionListener<NodesStatsResponse>() {
                 @Override
                 public void onResponse(NodesStatsResponse nodeStats) {
@@ -178,12 +187,26 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
                 }
             };
 
-        private ActionListener<ClusterHealthResponse> clusterHealthResponseActionListener =
+        private final ActionListener<NodesInfoResponse> localNodesInfoResponseActionListener =
+            new ActionListener<NodesInfoResponse>() {
+                @Override
+                public void onResponse(NodesInfoResponse nodesInfoResponse) {
+                    localNodesInfoResponse = nodesInfoResponse;
+                    client.admin().cluster().nodesStats(nodesStatsRequest, nodesStatsResponseActionListener);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    listener.onFailure(new OpenSearchException("Nodes info request failed for local node", e));
+                }
+            };
+
+        private final ActionListener<ClusterHealthResponse> clusterHealthResponseActionListener =
             new ActionListener<ClusterHealthResponse>() {
                 @Override
                 public void onResponse(ClusterHealthResponse response) {
                     clusterHealthResponse = response;
-                    client.admin().cluster().nodesStats(nodesStatsRequest, nodesStatsResponseActionListener);
+                    client.admin().cluster().nodesInfo(localNodesInfoRequest, localNodesInfoResponseActionListener);
                 }
 
                 @Override
@@ -197,11 +220,15 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
         }
 
         protected NodePrometheusMetricsResponse buildResponse(ClusterHealthResponse clusterHealth,
+                                                              NodesInfoResponse localNodesInfoResponse,
                                                               NodesStatsResponse nodesStats,
                                                               @Nullable IndicesStatsResponse indicesStats,
                                                               @Nullable ClusterStateResponse clusterStateResponse) {
-            NodePrometheusMetricsResponse response = new NodePrometheusMetricsResponse(clusterHealth,
-                    nodesStats.getNodes().get(0), indicesStats, clusterStateResponse,
+            NodePrometheusMetricsResponse response = new NodePrometheusMetricsResponse(
+                    clusterHealth,
+                    localNodesInfoResponse,
+                    nodesStats.getNodes().toArray(new NodeStats[0]),
+                    indicesStats, clusterStateResponse,
                     settings, clusterSettings);
             if (logger.isTraceEnabled()) {
                 logger.trace("Return response: [{}]", response);

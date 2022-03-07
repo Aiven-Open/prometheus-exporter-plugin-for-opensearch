@@ -25,6 +25,8 @@ import org.opensearch.action.admin.indices.stats.IndexStats;
 import org.opensearch.action.admin.indices.stats.IndicesStatsResponse;
 import org.opensearch.cluster.health.ClusterIndexHealth;
 import org.opensearch.cluster.node.DiscoveryNodeRole;
+import org.opensearch.common.Nullable;
+import org.opensearch.common.collect.Tuple;
 import org.opensearch.http.HttpStats;
 import org.opensearch.indices.NodeIndicesStats;
 import org.opensearch.indices.breaker.AllCircuitBreakerStats;
@@ -38,6 +40,7 @@ import org.opensearch.script.ScriptStats;
 import org.opensearch.threadpool.ThreadPoolStats;
 import org.opensearch.transport.TransportStats;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +101,7 @@ public class PrometheusMetricsCollector {
         catalog.registerClusterGauge("cluster_inflight_fetch_number", "Number of in flight fetches");
     }
 
-    private void updateClusterMetrics(ClusterHealthResponse chr) {
+    private void updateClusterMetrics(@Nullable ClusterHealthResponse chr) {
         if (chr != null) {
             catalog.setClusterGauge("cluster_status", chr.getStatus().value());
 
@@ -127,7 +130,7 @@ public class PrometheusMetricsCollector {
         catalog.registerNodeGauge("node_role_bool", "Node role", "role");
     }
 
-    private void updateNodeMetrics(NodeStats ns) {
+    private void updateNodeMetrics(Tuple<String, String> nodeInfo, NodeStats ns) {
         if (ns != null) {
 
             // Plugins can introduce custom node roles from 7.3.0: https://github.com/elastic/elasticsearch/pull/43175
@@ -143,7 +146,7 @@ public class PrometheusMetricsCollector {
             }
 
             for (String k : roles.keySet()) {
-                catalog.setNodeGauge("node_role_bool", roles.get(k), k);
+                catalog.setNodeGauge(nodeInfo, "node_role_bool", roles.get(k), k);
             }
         }
     }
@@ -237,108 +240,105 @@ public class PrometheusMetricsCollector {
         catalog.registerNodeGauge("indices_recovery_throttle_time_seconds", "Time spent while throttling recoveries");
     }
 
-    private void updateIndicesMetrics(NodeIndicesStats idx) {
+    private void updateIndicesMetrics(Tuple<String, String> nodeInfo, NodeIndicesStats idx) {
         if (idx != null) {
-            catalog.setNodeGauge("indices_doc_number", idx.getDocs().getCount());
-            catalog.setNodeGauge("indices_doc_deleted_number", idx.getDocs().getDeleted());
+            catalog.setNodeGauge(nodeInfo,"indices_doc_number", idx.getDocs().getCount());
+            catalog.setNodeGauge(nodeInfo,"indices_doc_deleted_number", idx.getDocs().getDeleted());
 
-            catalog.setNodeGauge("indices_store_size_bytes", idx.getStore().getSizeInBytes());
+            catalog.setNodeGauge(nodeInfo,"indices_store_size_bytes", idx.getStore().getSizeInBytes());
 
-            catalog.setNodeGauge("indices_indexing_delete_count", idx.getIndexing().getTotal().getDeleteCount());
-            catalog.setNodeGauge("indices_indexing_delete_current_number", idx.getIndexing().getTotal().getDeleteCurrent());
-            catalog.setNodeGauge("indices_indexing_delete_time_seconds",
+            catalog.setNodeGauge(nodeInfo,"indices_indexing_delete_count", idx.getIndexing().getTotal().getDeleteCount());
+            catalog.setNodeGauge(nodeInfo,"indices_indexing_delete_current_number", idx.getIndexing().getTotal().getDeleteCurrent());
+            catalog.setNodeGauge(nodeInfo,"indices_indexing_delete_time_seconds",
                     idx.getIndexing().getTotal().getDeleteTime().seconds());
-            catalog.setNodeGauge("indices_indexing_index_count", idx.getIndexing().getTotal().getIndexCount());
-            catalog.setNodeGauge("indices_indexing_index_current_number", idx.getIndexing().getTotal().getIndexCurrent());
-            catalog.setNodeGauge("indices_indexing_index_failed_count", idx.getIndexing().getTotal().getIndexFailedCount());
-            catalog.setNodeGauge("indices_indexing_index_time_seconds", idx.getIndexing().getTotal().getIndexTime().seconds());
-            catalog.setNodeGauge("indices_indexing_noop_update_count", idx.getIndexing().getTotal().getNoopUpdateCount());
-            catalog.setNodeGauge("indices_indexing_is_throttled_bool", idx.getIndexing().getTotal().isThrottled() ? 1 : 0);
-            catalog.setNodeGauge("indices_indexing_throttle_time_seconds",
+            catalog.setNodeGauge(nodeInfo,"indices_indexing_index_count", idx.getIndexing().getTotal().getIndexCount());
+            catalog.setNodeGauge(nodeInfo,"indices_indexing_index_current_number", idx.getIndexing().getTotal().getIndexCurrent());
+            catalog.setNodeGauge(nodeInfo,"indices_indexing_index_failed_count", idx.getIndexing().getTotal().getIndexFailedCount());
+            catalog.setNodeGauge(nodeInfo,"indices_indexing_index_time_seconds", idx.getIndexing().getTotal().getIndexTime().seconds());
+            catalog.setNodeGauge(nodeInfo,"indices_indexing_noop_update_count", idx.getIndexing().getTotal().getNoopUpdateCount());
+            catalog.setNodeGauge(nodeInfo,"indices_indexing_is_throttled_bool", idx.getIndexing().getTotal().isThrottled() ? 1 : 0);
+            catalog.setNodeGauge(nodeInfo,"indices_indexing_throttle_time_seconds",
                     idx.getIndexing().getTotal().getThrottleTime().seconds());
 
-            catalog.setNodeGauge("indices_get_count", idx.getGet().getCount());
-            catalog.setNodeGauge("indices_get_time_seconds", idx.getGet().getTimeInMillis() / 1000.0);
-            catalog.setNodeGauge("indices_get_exists_count", idx.getGet().getExistsCount());
-            catalog.setNodeGauge("indices_get_exists_time_seconds", idx.getGet().getExistsTimeInMillis() / 1000.0);
-            catalog.setNodeGauge("indices_get_missing_count", idx.getGet().getMissingCount());
-            catalog.setNodeGauge("indices_get_missing_time_seconds", idx.getGet().getMissingTimeInMillis() / 1000.0);
-            catalog.setNodeGauge("indices_get_current_number", idx.getGet().current());
+            catalog.setNodeGauge(nodeInfo,"indices_get_count", idx.getGet().getCount());
+            catalog.setNodeGauge(nodeInfo,"indices_get_time_seconds", idx.getGet().getTimeInMillis() / 1000.0);
+            catalog.setNodeGauge(nodeInfo,"indices_get_exists_count", idx.getGet().getExistsCount());
+            catalog.setNodeGauge(nodeInfo,"indices_get_exists_time_seconds", idx.getGet().getExistsTimeInMillis() / 1000.0);
+            catalog.setNodeGauge(nodeInfo,"indices_get_missing_count", idx.getGet().getMissingCount());
+            catalog.setNodeGauge(nodeInfo,"indices_get_missing_time_seconds", idx.getGet().getMissingTimeInMillis() / 1000.0);
+            catalog.setNodeGauge(nodeInfo,"indices_get_current_number", idx.getGet().current());
 
-            catalog.setNodeGauge("indices_search_open_contexts_number", idx.getSearch().getOpenContexts());
-            catalog.setNodeGauge("indices_search_fetch_count", idx.getSearch().getTotal().getFetchCount());
-            catalog.setNodeGauge("indices_search_fetch_current_number", idx.getSearch().getTotal().getFetchCurrent());
-            catalog.setNodeGauge("indices_search_fetch_time_seconds",
+            catalog.setNodeGauge(nodeInfo,"indices_search_open_contexts_number", idx.getSearch().getOpenContexts());
+            catalog.setNodeGauge(nodeInfo,"indices_search_fetch_count", idx.getSearch().getTotal().getFetchCount());
+            catalog.setNodeGauge(nodeInfo,"indices_search_fetch_current_number", idx.getSearch().getTotal().getFetchCurrent());
+            catalog.setNodeGauge(nodeInfo,"indices_search_fetch_time_seconds",
                     idx.getSearch().getTotal().getFetchTimeInMillis() / 1000.0);
-            catalog.setNodeGauge("indices_search_query_count", idx.getSearch().getTotal().getQueryCount());
-            catalog.setNodeGauge("indices_search_query_current_number", idx.getSearch().getTotal().getQueryCurrent());
-            catalog.setNodeGauge("indices_search_query_time_seconds",
+            catalog.setNodeGauge(nodeInfo,"indices_search_query_count", idx.getSearch().getTotal().getQueryCount());
+            catalog.setNodeGauge(nodeInfo,"indices_search_query_current_number", idx.getSearch().getTotal().getQueryCurrent());
+            catalog.setNodeGauge(nodeInfo,"indices_search_query_time_seconds",
                     idx.getSearch().getTotal().getQueryTimeInMillis() / 1000.0);
-            catalog.setNodeGauge("indices_search_scroll_count", idx.getSearch().getTotal().getScrollCount());
-            catalog.setNodeGauge("indices_search_scroll_current_number", idx.getSearch().getTotal().getScrollCurrent());
-            catalog.setNodeGauge("indices_search_scroll_time_seconds",
+            catalog.setNodeGauge(nodeInfo,"indices_search_scroll_count", idx.getSearch().getTotal().getScrollCount());
+            catalog.setNodeGauge(nodeInfo,"indices_search_scroll_current_number", idx.getSearch().getTotal().getScrollCurrent());
+            catalog.setNodeGauge(nodeInfo,"indices_search_scroll_time_seconds",
                     idx.getSearch().getTotal().getScrollTimeInMillis() / 1000.0);
 
-            catalog.setNodeGauge("indices_merges_current_number", idx.getMerge().getCurrent());
-            catalog.setNodeGauge("indices_merges_current_docs_number", idx.getMerge().getCurrentNumDocs());
-            catalog.setNodeGauge("indices_merges_current_size_bytes", idx.getMerge().getCurrentSizeInBytes());
-            catalog.setNodeGauge("indices_merges_total_number", idx.getMerge().getTotal());
-            catalog.setNodeGauge("indices_merges_total_time_seconds", idx.getMerge().getTotalTimeInMillis() / 1000.0);
-            catalog.setNodeGauge("indices_merges_total_docs_count", idx.getMerge().getTotalNumDocs());
-            catalog.setNodeGauge("indices_merges_total_size_bytes", idx.getMerge().getTotalSizeInBytes());
-            catalog.setNodeGauge("indices_merges_total_stopped_time_seconds",
+            catalog.setNodeGauge(nodeInfo,"indices_merges_current_number", idx.getMerge().getCurrent());
+            catalog.setNodeGauge(nodeInfo,"indices_merges_current_docs_number", idx.getMerge().getCurrentNumDocs());
+            catalog.setNodeGauge(nodeInfo,"indices_merges_current_size_bytes", idx.getMerge().getCurrentSizeInBytes());
+            catalog.setNodeGauge(nodeInfo,"indices_merges_total_number", idx.getMerge().getTotal());
+            catalog.setNodeGauge(nodeInfo,"indices_merges_total_time_seconds", idx.getMerge().getTotalTimeInMillis() / 1000.0);
+            catalog.setNodeGauge(nodeInfo,"indices_merges_total_docs_count", idx.getMerge().getTotalNumDocs());
+            catalog.setNodeGauge(nodeInfo,"indices_merges_total_size_bytes", idx.getMerge().getTotalSizeInBytes());
+            catalog.setNodeGauge(nodeInfo,"indices_merges_total_stopped_time_seconds",
                     idx.getMerge().getTotalStoppedTimeInMillis() / 1000.0);
-            catalog.setNodeGauge("indices_merges_total_throttled_time_seconds",
+            catalog.setNodeGauge(nodeInfo,"indices_merges_total_throttled_time_seconds",
                     idx.getMerge().getTotalThrottledTimeInMillis() / 1000.0);
-            catalog.setNodeGauge("indices_merges_total_auto_throttle_bytes", idx.getMerge().getTotalBytesPerSecAutoThrottle());
+            catalog.setNodeGauge(nodeInfo,"indices_merges_total_auto_throttle_bytes", idx.getMerge().getTotalBytesPerSecAutoThrottle());
 
-            catalog.setNodeGauge("indices_refresh_total_count", idx.getRefresh().getTotal());
-            catalog.setNodeGauge("indices_refresh_total_time_seconds", idx.getRefresh().getTotalTimeInMillis() / 1000.0);
-            catalog.setNodeGauge("indices_refresh_listeners_number", idx.getRefresh().getListeners());
+            catalog.setNodeGauge(nodeInfo,"indices_refresh_total_count", idx.getRefresh().getTotal());
+            catalog.setNodeGauge(nodeInfo,"indices_refresh_total_time_seconds", idx.getRefresh().getTotalTimeInMillis() / 1000.0);
+            catalog.setNodeGauge(nodeInfo,"indices_refresh_listeners_number", idx.getRefresh().getListeners());
 
-            catalog.setNodeGauge("indices_flush_total_count", idx.getFlush().getTotal());
-            catalog.setNodeGauge("indices_flush_total_time_seconds", idx.getFlush().getTotalTimeInMillis() / 1000.0);
+            catalog.setNodeGauge(nodeInfo,"indices_flush_total_count", idx.getFlush().getTotal());
+            catalog.setNodeGauge(nodeInfo,"indices_flush_total_time_seconds", idx.getFlush().getTotalTimeInMillis() / 1000.0);
 
-            catalog.setNodeGauge("indices_querycache_cache_count", idx.getQueryCache().getCacheCount());
-            catalog.setNodeGauge("indices_querycache_cache_size_bytes", idx.getQueryCache().getCacheSize());
-            catalog.setNodeGauge("indices_querycache_evictions_count", idx.getQueryCache().getEvictions());
-            catalog.setNodeGauge("indices_querycache_hit_count", idx.getQueryCache().getHitCount());
-            catalog.setNodeGauge("indices_querycache_memory_size_bytes", idx.getQueryCache().getMemorySizeInBytes());
-            catalog.setNodeGauge("indices_querycache_miss_number", idx.getQueryCache().getMissCount());
-            catalog.setNodeGauge("indices_querycache_total_number", idx.getQueryCache().getTotalCount());
+            catalog.setNodeGauge(nodeInfo,"indices_querycache_cache_count", idx.getQueryCache().getCacheCount());
+            catalog.setNodeGauge(nodeInfo,"indices_querycache_cache_size_bytes", idx.getQueryCache().getCacheSize());
+            catalog.setNodeGauge(nodeInfo,"indices_querycache_evictions_count", idx.getQueryCache().getEvictions());
+            catalog.setNodeGauge(nodeInfo,"indices_querycache_hit_count", idx.getQueryCache().getHitCount());
+            catalog.setNodeGauge(nodeInfo,"indices_querycache_memory_size_bytes", idx.getQueryCache().getMemorySizeInBytes());
+            catalog.setNodeGauge(nodeInfo,"indices_querycache_miss_number", idx.getQueryCache().getMissCount());
+            catalog.setNodeGauge(nodeInfo,"indices_querycache_total_number", idx.getQueryCache().getTotalCount());
 
-            catalog.setNodeGauge("indices_fielddata_memory_size_bytes", idx.getFieldData().getMemorySizeInBytes());
-            catalog.setNodeGauge("indices_fielddata_evictions_count", idx.getFieldData().getEvictions());
+            catalog.setNodeGauge(nodeInfo,"indices_fielddata_memory_size_bytes", idx.getFieldData().getMemorySizeInBytes());
+            catalog.setNodeGauge(nodeInfo,"indices_fielddata_evictions_count", idx.getFieldData().getEvictions());
 
-            catalog.setNodeGauge("indices_completion_size_bytes", idx.getCompletion().getSizeInBytes());
+            catalog.setNodeGauge(nodeInfo,"indices_completion_size_bytes", idx.getCompletion().getSizeInBytes());
 
-            catalog.setNodeGauge("indices_segments_number", idx.getSegments().getCount());
-            catalog.setNodeGauge("indices_segments_memory_bytes", idx.getSegments().getMemoryInBytes(), "all");
-            catalog.setNodeGauge("indices_segments_memory_bytes", idx.getSegments().getBitsetMemoryInBytes(), "bitset");
-            catalog.setNodeGauge("indices_segments_memory_bytes", idx.getSegments().getDocValuesMemoryInBytes(), "docvalues");
-            catalog.setNodeGauge("indices_segments_memory_bytes", idx.getSegments().getIndexWriterMemoryInBytes(),
-                    "indexwriter");
-            catalog.setNodeGauge("indices_segments_memory_bytes", idx.getSegments().getNormsMemoryInBytes(), "norms");
-            catalog.setNodeGauge("indices_segments_memory_bytes", idx.getSegments().getStoredFieldsMemoryInBytes(),
-                    "storefields");
-            catalog.setNodeGauge("indices_segments_memory_bytes", idx.getSegments().getTermsMemoryInBytes(), "terms");
-            catalog.setNodeGauge("indices_segments_memory_bytes", idx.getSegments().getTermVectorsMemoryInBytes(),
-                    "termvectors");
-            catalog.setNodeGauge("indices_segments_memory_bytes", idx.getSegments().getVersionMapMemoryInBytes(), "versionmap");
-            catalog.setNodeGauge("indices_segments_memory_bytes", idx.getSegments().getPointsMemoryInBytes(), "points");
+            catalog.setNodeGauge(nodeInfo,"indices_segments_number", idx.getSegments().getCount());
+            catalog.setNodeGauge(nodeInfo,"indices_segments_memory_bytes", idx.getSegments().getMemoryInBytes(), "all");
+            catalog.setNodeGauge(nodeInfo,"indices_segments_memory_bytes", idx.getSegments().getBitsetMemoryInBytes(), "bitset");
+            catalog.setNodeGauge(nodeInfo,"indices_segments_memory_bytes", idx.getSegments().getDocValuesMemoryInBytes(), "docvalues");
+            catalog.setNodeGauge(nodeInfo,"indices_segments_memory_bytes", idx.getSegments().getIndexWriterMemoryInBytes(), "indexwriter");
+            catalog.setNodeGauge(nodeInfo,"indices_segments_memory_bytes", idx.getSegments().getNormsMemoryInBytes(), "norms");
+            catalog.setNodeGauge(nodeInfo,"indices_segments_memory_bytes", idx.getSegments().getStoredFieldsMemoryInBytes(), "storefields");
+            catalog.setNodeGauge(nodeInfo,"indices_segments_memory_bytes", idx.getSegments().getTermsMemoryInBytes(), "terms");
+            catalog.setNodeGauge(nodeInfo,"indices_segments_memory_bytes", idx.getSegments().getTermVectorsMemoryInBytes(), "termvectors");
+            catalog.setNodeGauge(nodeInfo,"indices_segments_memory_bytes", idx.getSegments().getVersionMapMemoryInBytes(), "versionmap");
+            catalog.setNodeGauge(nodeInfo,"indices_segments_memory_bytes", idx.getSegments().getPointsMemoryInBytes(), "points");
 
-            catalog.setNodeGauge("indices_suggest_current_number", idx.getSearch().getTotal().getSuggestCurrent());
-            catalog.setNodeGauge("indices_suggest_count", idx.getSearch().getTotal().getSuggestCount());
-            catalog.setNodeGauge("indices_suggest_time_seconds", idx.getSearch().getTotal().getSuggestTimeInMillis() / 1000.0);
+            catalog.setNodeGauge(nodeInfo,"indices_suggest_current_number", idx.getSearch().getTotal().getSuggestCurrent());
+            catalog.setNodeGauge(nodeInfo,"indices_suggest_count", idx.getSearch().getTotal().getSuggestCount());
+            catalog.setNodeGauge(nodeInfo,"indices_suggest_time_seconds", idx.getSearch().getTotal().getSuggestTimeInMillis() / 1000.0);
 
-            catalog.setNodeGauge("indices_requestcache_memory_size_bytes", idx.getRequestCache().getMemorySizeInBytes());
-            catalog.setNodeGauge("indices_requestcache_hit_count", idx.getRequestCache().getHitCount());
-            catalog.setNodeGauge("indices_requestcache_miss_count", idx.getRequestCache().getMissCount());
-            catalog.setNodeGauge("indices_requestcache_evictions_count", idx.getRequestCache().getEvictions());
+            catalog.setNodeGauge(nodeInfo,"indices_requestcache_memory_size_bytes", idx.getRequestCache().getMemorySizeInBytes());
+            catalog.setNodeGauge(nodeInfo,"indices_requestcache_hit_count", idx.getRequestCache().getHitCount());
+            catalog.setNodeGauge(nodeInfo,"indices_requestcache_miss_count", idx.getRequestCache().getMissCount());
+            catalog.setNodeGauge(nodeInfo,"indices_requestcache_evictions_count", idx.getRequestCache().getEvictions());
 
-            catalog.setNodeGauge("indices_recovery_current_number", idx.getRecoveryStats().currentAsSource(), "source");
-            catalog.setNodeGauge("indices_recovery_current_number", idx.getRecoveryStats().currentAsTarget(), "target");
-            catalog.setNodeGauge("indices_recovery_throttle_time_seconds", idx.getRecoveryStats().throttleTime().getSeconds());
+            catalog.setNodeGauge(nodeInfo,"indices_recovery_current_number", idx.getRecoveryStats().currentAsSource(), "source");
+            catalog.setNodeGauge(nodeInfo,"indices_recovery_current_number", idx.getRecoveryStats().currentAsTarget(), "target");
+            catalog.setNodeGauge(nodeInfo,"indices_recovery_throttle_time_seconds", idx.getRecoveryStats().throttleTime().getSeconds());
         }
     }
 
@@ -442,7 +442,7 @@ public class PrometheusMetricsCollector {
         catalog.registerClusterGauge("index_warmer_count", "Counter of warmers", "index", "context");
     }
 
-    private void updatePerIndexMetrics(ClusterHealthResponse chr, IndicesStatsResponse isr) {
+    private void updatePerIndexMetrics(@Nullable ClusterHealthResponse chr, @Nullable IndicesStatsResponse isr) {
 
         if (chr != null && isr != null) {
             for (Map.Entry<String, IndexStats> entry : isr.getIndices().entrySet()) {
@@ -579,15 +579,15 @@ public class PrometheusMetricsCollector {
         catalog.registerNodeGauge("transport_tx_bytes_count", "Bytes sent");
     }
 
-    private void updateTransportMetrics(TransportStats ts) {
+    private void updateTransportMetrics(Tuple<String, String> nodeInfo, TransportStats ts) {
         if (ts != null) {
-            catalog.setNodeGauge("transport_server_open_number", ts.getServerOpen());
+            catalog.setNodeGauge(nodeInfo, "transport_server_open_number", ts.getServerOpen());
 
-            catalog.setNodeGauge("transport_rx_packets_count", ts.getRxCount());
-            catalog.setNodeGauge("transport_tx_packets_count", ts.getTxCount());
+            catalog.setNodeGauge(nodeInfo, "transport_rx_packets_count", ts.getRxCount());
+            catalog.setNodeGauge(nodeInfo, "transport_tx_packets_count", ts.getTxCount());
 
-            catalog.setNodeGauge("transport_rx_bytes_count", ts.getRxSize().getBytes());
-            catalog.setNodeGauge("transport_tx_bytes_count", ts.getTxSize().getBytes());
+            catalog.setNodeGauge(nodeInfo, "transport_rx_bytes_count", ts.getRxSize().getBytes());
+            catalog.setNodeGauge(nodeInfo, "transport_tx_bytes_count", ts.getTxSize().getBytes());
         }
     }
 
@@ -596,10 +596,10 @@ public class PrometheusMetricsCollector {
         catalog.registerNodeGauge("http_open_total_count", "Count of opened connections");
     }
 
-    private void updateHTTPMetrics(HttpStats http) {
+    private void updateHTTPMetrics(Tuple<String, String> nodeInfo, HttpStats http) {
         if (http != null) {
-            catalog.setNodeGauge("http_open_server_number", http.getServerOpen());
-            catalog.setNodeGauge("http_open_total_count", http.getTotalOpen());
+            catalog.setNodeGauge(nodeInfo, "http_open_server_number", http.getServerOpen());
+            catalog.setNodeGauge(nodeInfo, "http_open_total_count", http.getTotalOpen());
         }
     }
 
@@ -609,16 +609,16 @@ public class PrometheusMetricsCollector {
         catalog.registerNodeGauge("threadpool_tasks_number", "Number of tasks in thread pool", "name", "type");
     }
 
-    private void updateThreadPoolMetrics(ThreadPoolStats tps) {
+    private void updateThreadPoolMetrics(Tuple<String, String> nodeInfo, ThreadPoolStats tps) {
         if (tps != null) {
             for (ThreadPoolStats.Stats st : tps) {
                 String name = st.getName();
-                catalog.setNodeGauge("threadpool_threads_number", st.getThreads(), name, "threads");
-                catalog.setNodeGauge("threadpool_threads_number", st.getActive(), name, "active");
-                catalog.setNodeGauge("threadpool_threads_number", st.getLargest(), name, "largest");
-                catalog.setNodeGauge("threadpool_threads_count", st.getCompleted(), name, "completed");
-                catalog.setNodeGauge("threadpool_threads_count", st.getRejected(), name, "rejected");
-                catalog.setNodeGauge("threadpool_tasks_number", st.getQueue(), name, "queue");
+                catalog.setNodeGauge(nodeInfo, "threadpool_threads_number", st.getThreads(), name, "threads");
+                catalog.setNodeGauge(nodeInfo, "threadpool_threads_number", st.getActive(), name, "active");
+                catalog.setNodeGauge(nodeInfo, "threadpool_threads_number", st.getLargest(), name, "largest");
+                catalog.setNodeGauge(nodeInfo, "threadpool_threads_count", st.getCompleted(), name, "completed");
+                catalog.setNodeGauge(nodeInfo, "threadpool_threads_count", st.getRejected(), name, "rejected");
+                catalog.setNodeGauge(nodeInfo, "threadpool_tasks_number", st.getQueue(), name, "queue");
             }
         }
     }
@@ -642,30 +642,28 @@ public class PrometheusMetricsCollector {
     }
 
     @SuppressWarnings("checkstyle:LineLength")
-    private void updateIngestMetrics(IngestStats is) {
+    private void updateIngestMetrics(Tuple<String, String> nodeInfo, IngestStats is) {
         if (is != null) {
-            catalog.setNodeGauge("ingest_total_count", is.getTotalStats().getIngestCount());
-            catalog.setNodeGauge("ingest_total_time_seconds", is.getTotalStats().getIngestTimeInMillis() / 1000.0);
-            catalog.setNodeGauge("ingest_total_current", is.getTotalStats().getIngestCurrent());
-            catalog.setNodeGauge("ingest_total_failed_count", is.getTotalStats().getIngestFailedCount());
+            catalog.setNodeGauge(nodeInfo, "ingest_total_count", is.getTotalStats().getIngestCount());
+            catalog.setNodeGauge(nodeInfo, "ingest_total_time_seconds", is.getTotalStats().getIngestTimeInMillis() / 1000.0);
+            catalog.setNodeGauge(nodeInfo, "ingest_total_current", is.getTotalStats().getIngestCurrent());
+            catalog.setNodeGauge(nodeInfo, "ingest_total_failed_count", is.getTotalStats().getIngestFailedCount());
 
             for (IngestStats.PipelineStat st : is.getPipelineStats()) {
                 String pipeline = st.getPipelineId();
-                catalog.setNodeGauge("ingest_pipeline_total_count", st.getStats().getIngestCount(), pipeline);
-                catalog.setNodeGauge("ingest_pipeline_total_time_seconds", st.getStats().getIngestTimeInMillis() / 1000.0,
-                        pipeline);
-                catalog.setNodeGauge("ingest_pipeline_total_current", st.getStats().getIngestCurrent(), pipeline);
-                catalog.setNodeGauge("ingest_pipeline_total_failed_count", st.getStats().getIngestFailedCount(), pipeline);
+                catalog.setNodeGauge(nodeInfo, "ingest_pipeline_total_count", st.getStats().getIngestCount(), pipeline);
+                catalog.setNodeGauge(nodeInfo, "ingest_pipeline_total_time_seconds", st.getStats().getIngestTimeInMillis() / 1000.0, pipeline);
+                catalog.setNodeGauge(nodeInfo, "ingest_pipeline_total_current", st.getStats().getIngestCurrent(), pipeline);
+                catalog.setNodeGauge(nodeInfo, "ingest_pipeline_total_failed_count", st.getStats().getIngestFailedCount(), pipeline);
 
                 List<IngestStats.ProcessorStat> pss = is.getProcessorStats().get(pipeline);
                 if (pss != null) {
                     for (IngestStats.ProcessorStat ps : pss) {
                         String processor = ps.getName();
-                        catalog.setNodeGauge("ingest_pipeline_processor_total_count", ps.getStats().getIngestCount(), pipeline, processor);
-                        catalog.setNodeGauge("ingest_pipeline_processor_total_time_seconds", ps.getStats().getIngestTimeInMillis() / 1000.0,
-                                pipeline, processor);
-                        catalog.setNodeGauge("ingest_pipeline_processor_total_current", ps.getStats().getIngestCurrent(), pipeline, processor);
-                        catalog.setNodeGauge("ingest_pipeline_processor_total_failed_count", ps.getStats().getIngestFailedCount(), pipeline, processor);
+                        catalog.setNodeGauge(nodeInfo, "ingest_pipeline_processor_total_count", ps.getStats().getIngestCount(), pipeline, processor);
+                        catalog.setNodeGauge(nodeInfo, "ingest_pipeline_processor_total_time_seconds", ps.getStats().getIngestTimeInMillis() / 1000.0, pipeline, processor);
+                        catalog.setNodeGauge(nodeInfo, "ingest_pipeline_processor_total_current", ps.getStats().getIngestCurrent(), pipeline, processor);
+                        catalog.setNodeGauge(nodeInfo, "ingest_pipeline_processor_total_failed_count", ps.getStats().getIngestFailedCount(), pipeline, processor);
                     }
                 }
             }
@@ -679,14 +677,14 @@ public class PrometheusMetricsCollector {
         catalog.registerNodeGauge("circuitbreaker_tripped_count", "Circuit breaker tripped count", "name");
     }
 
-    private void updateCircuitBreakersMetrics(AllCircuitBreakerStats acbs) {
+    private void updateCircuitBreakersMetrics(Tuple<String, String> nodeInfo, AllCircuitBreakerStats acbs) {
         if (acbs != null) {
             for (CircuitBreakerStats cbs : acbs.getAllStats()) {
                 String name = cbs.getName();
-                catalog.setNodeGauge("circuitbreaker_estimated_bytes", cbs.getEstimated(), name);
-                catalog.setNodeGauge("circuitbreaker_limit_bytes", cbs.getLimit(), name);
-                catalog.setNodeGauge("circuitbreaker_overhead_ratio", cbs.getOverhead(), name);
-                catalog.setNodeGauge("circuitbreaker_tripped_count", cbs.getTrippedCount(), name);
+                catalog.setNodeGauge(nodeInfo, "circuitbreaker_estimated_bytes", cbs.getEstimated(), name);
+                catalog.setNodeGauge(nodeInfo, "circuitbreaker_limit_bytes", cbs.getLimit(), name);
+                catalog.setNodeGauge(nodeInfo, "circuitbreaker_overhead_ratio", cbs.getOverhead(), name);
+                catalog.setNodeGauge(nodeInfo, "circuitbreaker_tripped_count", cbs.getTrippedCount(), name);
             }
         }
     }
@@ -696,10 +694,10 @@ public class PrometheusMetricsCollector {
         catalog.registerNodeGauge("script_compilations_count", "Number of scripts compilations");
     }
 
-    private void updateScriptMetrics(ScriptStats sc) {
+    private void updateScriptMetrics(Tuple<String, String> nodeInfo, ScriptStats sc) {
         if (sc != null) {
-            catalog.setNodeGauge("script_cache_evictions_count", sc.getCacheEvictions());
-            catalog.setNodeGauge("script_compilations_count", sc.getCompilations());
+            catalog.setNodeGauge(nodeInfo, "script_cache_evictions_count", sc.getCacheEvictions());
+            catalog.setNodeGauge(nodeInfo, "script_compilations_count", sc.getCompilations());
         }
     }
 
@@ -713,15 +711,15 @@ public class PrometheusMetricsCollector {
         catalog.registerNodeGauge("process_file_descriptors_max_number", "Max file descriptors");
     }
 
-    private void updateProcessMetrics(ProcessStats ps) {
+    private void updateProcessMetrics(Tuple<String, String> nodeInfo, ProcessStats ps) {
         if (ps != null) {
-            catalog.setNodeGauge("process_cpu_percent", ps.getCpu().getPercent());
-            catalog.setNodeGauge("process_cpu_time_seconds", ps.getCpu().getTotal().getSeconds());
+            catalog.setNodeGauge(nodeInfo, "process_cpu_percent", ps.getCpu().getPercent());
+            catalog.setNodeGauge(nodeInfo, "process_cpu_time_seconds", ps.getCpu().getTotal().getSeconds());
 
-            catalog.setNodeGauge("process_mem_total_virtual_bytes", ps.getMem().getTotalVirtual().getBytes());
+            catalog.setNodeGauge(nodeInfo, "process_mem_total_virtual_bytes", ps.getMem().getTotalVirtual().getBytes());
 
-            catalog.setNodeGauge("process_file_descriptors_open_number", ps.getOpenFileDescriptors());
-            catalog.setNodeGauge("process_file_descriptors_max_number", ps.getMaxFileDescriptors());
+            catalog.setNodeGauge(nodeInfo, "process_file_descriptors_open_number", ps.getOpenFileDescriptors());
+            catalog.setNodeGauge(nodeInfo, "process_file_descriptors_max_number", ps.getMaxFileDescriptors());
         }
     }
 
@@ -755,44 +753,44 @@ public class PrometheusMetricsCollector {
         catalog.registerNodeGauge("jvm_classes_unloaded_number", "Count of unloaded classes");
     }
 
-    private void updateJVMMetrics(JvmStats jvm) {
+    private void updateJVMMetrics(Tuple<String, String> nodeInfo, JvmStats jvm) {
         if (jvm != null) {
-            catalog.setNodeGauge("jvm_uptime_seconds", jvm.getUptime().getSeconds());
+            catalog.setNodeGauge(nodeInfo, "jvm_uptime_seconds", jvm.getUptime().getSeconds());
 
-            catalog.setNodeGauge("jvm_mem_heap_max_bytes", jvm.getMem().getHeapMax().getBytes());
-            catalog.setNodeGauge("jvm_mem_heap_used_bytes", jvm.getMem().getHeapUsed().getBytes());
-            catalog.setNodeGauge("jvm_mem_heap_used_percent", jvm.getMem().getHeapUsedPercent());
-            catalog.setNodeGauge("jvm_mem_nonheap_used_bytes", jvm.getMem().getNonHeapUsed().getBytes());
-            catalog.setNodeGauge("jvm_mem_heap_committed_bytes", jvm.getMem().getHeapCommitted().getBytes());
-            catalog.setNodeGauge("jvm_mem_nonheap_committed_bytes", jvm.getMem().getNonHeapCommitted().getBytes());
+            catalog.setNodeGauge(nodeInfo, "jvm_mem_heap_max_bytes", jvm.getMem().getHeapMax().getBytes());
+            catalog.setNodeGauge(nodeInfo, "jvm_mem_heap_used_bytes", jvm.getMem().getHeapUsed().getBytes());
+            catalog.setNodeGauge(nodeInfo, "jvm_mem_heap_used_percent", jvm.getMem().getHeapUsedPercent());
+            catalog.setNodeGauge(nodeInfo, "jvm_mem_nonheap_used_bytes", jvm.getMem().getNonHeapUsed().getBytes());
+            catalog.setNodeGauge(nodeInfo, "jvm_mem_heap_committed_bytes", jvm.getMem().getHeapCommitted().getBytes());
+            catalog.setNodeGauge(nodeInfo, "jvm_mem_nonheap_committed_bytes", jvm.getMem().getNonHeapCommitted().getBytes());
 
             for (JvmStats.MemoryPool mp : jvm.getMem()) {
                 String name = mp.getName();
-                catalog.setNodeGauge("jvm_mem_pool_max_bytes", mp.getMax().getBytes(), name);
-                catalog.setNodeGauge("jvm_mem_pool_peak_max_bytes", mp.getPeakMax().getBytes(), name);
-                catalog.setNodeGauge("jvm_mem_pool_used_bytes", mp.getUsed().getBytes(), name);
-                catalog.setNodeGauge("jvm_mem_pool_peak_used_bytes", mp.getPeakUsed().getBytes(), name);
+                catalog.setNodeGauge(nodeInfo, "jvm_mem_pool_max_bytes", mp.getMax().getBytes(), name);
+                catalog.setNodeGauge(nodeInfo, "jvm_mem_pool_peak_max_bytes", mp.getPeakMax().getBytes(), name);
+                catalog.setNodeGauge(nodeInfo, "jvm_mem_pool_used_bytes", mp.getUsed().getBytes(), name);
+                catalog.setNodeGauge(nodeInfo, "jvm_mem_pool_peak_used_bytes", mp.getPeakUsed().getBytes(), name);
             }
 
-            catalog.setNodeGauge("jvm_threads_number", jvm.getThreads().getCount());
-            catalog.setNodeGauge("jvm_threads_peak_number", jvm.getThreads().getPeakCount());
+            catalog.setNodeGauge(nodeInfo, "jvm_threads_number", jvm.getThreads().getCount());
+            catalog.setNodeGauge(nodeInfo, "jvm_threads_peak_number", jvm.getThreads().getPeakCount());
 
             for (JvmStats.GarbageCollector gc : jvm.getGc().getCollectors()) {
                 String name = gc.getName();
-                catalog.setNodeGauge("jvm_gc_collection_count", gc.getCollectionCount(), name);
-                catalog.setNodeGauge("jvm_gc_collection_time_seconds", gc.getCollectionTime().getSeconds(), name);
+                catalog.setNodeGauge(nodeInfo, "jvm_gc_collection_count", gc.getCollectionCount(), name);
+                catalog.setNodeGauge(nodeInfo, "jvm_gc_collection_time_seconds", gc.getCollectionTime().getSeconds(), name);
             }
 
             for (JvmStats.BufferPool bp : jvm.getBufferPools()) {
                 String name = bp.getName();
-                catalog.setNodeGauge("jvm_bufferpool_number", bp.getCount(), name);
-                catalog.setNodeGauge("jvm_bufferpool_total_capacity_bytes", bp.getTotalCapacity().getBytes(), name);
-                catalog.setNodeGauge("jvm_bufferpool_used_bytes", bp.getUsed().getBytes(), name);
+                catalog.setNodeGauge(nodeInfo, "jvm_bufferpool_number", bp.getCount(), name);
+                catalog.setNodeGauge(nodeInfo, "jvm_bufferpool_total_capacity_bytes", bp.getTotalCapacity().getBytes(), name);
+                catalog.setNodeGauge(nodeInfo, "jvm_bufferpool_used_bytes", bp.getUsed().getBytes(), name);
             }
             if (jvm.getClasses() != null) {
-                catalog.setNodeGauge("jvm_classes_loaded_number", jvm.getClasses().getLoadedClassCount());
-                catalog.setNodeGauge("jvm_classes_total_loaded_number", jvm.getClasses().getTotalLoadedClassCount());
-                catalog.setNodeGauge("jvm_classes_unloaded_number", jvm.getClasses().getUnloadedClassCount());
+                catalog.setNodeGauge(nodeInfo, "jvm_classes_loaded_number", jvm.getClasses().getLoadedClassCount());
+                catalog.setNodeGauge(nodeInfo, "jvm_classes_total_loaded_number", jvm.getClasses().getTotalLoadedClassCount());
+                catalog.setNodeGauge(nodeInfo, "jvm_classes_unloaded_number", jvm.getClasses().getUnloadedClassCount());
             }
         }
     }
@@ -815,30 +813,30 @@ public class PrometheusMetricsCollector {
         catalog.registerNodeGauge("os_swap_total_bytes", "Total swap size");
     }
 
-    private void updateOsMetrics(OsStats os) {
+    private void updateOsMetrics(Tuple<String, String> nodeInfo, OsStats os) {
         if (os != null) {
             if (os.getCpu() != null) {
-                catalog.setNodeGauge("os_cpu_percent", os.getCpu().getPercent());
+                catalog.setNodeGauge(nodeInfo, "os_cpu_percent", os.getCpu().getPercent());
                 double[] loadAverage = os.getCpu().getLoadAverage();
                 if (loadAverage != null && loadAverage.length == 3) {
-                    catalog.setNodeGauge("os_load_average_one_minute", os.getCpu().getLoadAverage()[0]);
-                    catalog.setNodeGauge("os_load_average_five_minutes", os.getCpu().getLoadAverage()[1]);
-                    catalog.setNodeGauge("os_load_average_fifteen_minutes", os.getCpu().getLoadAverage()[2]);
+                    catalog.setNodeGauge(nodeInfo, "os_load_average_one_minute", os.getCpu().getLoadAverage()[0]);
+                    catalog.setNodeGauge(nodeInfo, "os_load_average_five_minutes", os.getCpu().getLoadAverage()[1]);
+                    catalog.setNodeGauge(nodeInfo, "os_load_average_fifteen_minutes", os.getCpu().getLoadAverage()[2]);
                 }
             }
 
             if (os.getMem() != null) {
-                catalog.setNodeGauge("os_mem_free_bytes", os.getMem().getFree().getBytes());
-                catalog.setNodeGauge("os_mem_free_percent", os.getMem().getFreePercent());
-                catalog.setNodeGauge("os_mem_used_bytes", os.getMem().getUsed().getBytes());
-                catalog.setNodeGauge("os_mem_used_percent", os.getMem().getUsedPercent());
-                catalog.setNodeGauge("os_mem_total_bytes", os.getMem().getTotal().getBytes());
+                catalog.setNodeGauge(nodeInfo, "os_mem_free_bytes", os.getMem().getFree().getBytes());
+                catalog.setNodeGauge(nodeInfo, "os_mem_free_percent", os.getMem().getFreePercent());
+                catalog.setNodeGauge(nodeInfo, "os_mem_used_bytes", os.getMem().getUsed().getBytes());
+                catalog.setNodeGauge(nodeInfo, "os_mem_used_percent", os.getMem().getUsedPercent());
+                catalog.setNodeGauge(nodeInfo, "os_mem_total_bytes", os.getMem().getTotal().getBytes());
             }
 
             if (os.getSwap() != null) {
-                catalog.setNodeGauge("os_swap_free_bytes", os.getSwap().getFree().getBytes());
-                catalog.setNodeGauge("os_swap_used_bytes", os.getSwap().getUsed().getBytes());
-                catalog.setNodeGauge("os_swap_total_bytes", os.getSwap().getTotal().getBytes());
+                catalog.setNodeGauge(nodeInfo, "os_swap_free_bytes", os.getSwap().getFree().getBytes());
+                catalog.setNodeGauge(nodeInfo, "os_swap_used_bytes", os.getSwap().getUsed().getBytes());
+                catalog.setNodeGauge(nodeInfo, "os_swap_total_bytes", os.getSwap().getTotal().getBytes());
             }
         }
     }
@@ -859,28 +857,28 @@ public class PrometheusMetricsCollector {
         catalog.registerNodeGauge("fs_io_total_write_bytes", "Total IO write bytes");
     }
 
-    private void updateFsMetrics(FsInfo fs) {
+    private void updateFsMetrics(Tuple<String, String> nodeInfo, FsInfo fs) {
         if (fs != null) {
-            catalog.setNodeGauge("fs_total_total_bytes", fs.getTotal().getTotal().getBytes());
-            catalog.setNodeGauge("fs_total_available_bytes", fs.getTotal().getAvailable().getBytes());
-            catalog.setNodeGauge("fs_total_free_bytes", fs.getTotal().getFree().getBytes());
+            catalog.setNodeGauge(nodeInfo, "fs_total_total_bytes", fs.getTotal().getTotal().getBytes());
+            catalog.setNodeGauge(nodeInfo, "fs_total_available_bytes", fs.getTotal().getAvailable().getBytes());
+            catalog.setNodeGauge(nodeInfo, "fs_total_free_bytes", fs.getTotal().getFree().getBytes());
 
             for (FsInfo.Path fspath : fs) {
                 String path = fspath.getPath();
                 String mount = fspath.getMount();
                 String type = fspath.getType();
-                catalog.setNodeGauge("fs_path_total_bytes", fspath.getTotal().getBytes(), path, mount, type);
-                catalog.setNodeGauge("fs_path_available_bytes", fspath.getAvailable().getBytes(), path, mount, type);
-                catalog.setNodeGauge("fs_path_free_bytes", fspath.getFree().getBytes(), path, mount, type);
+                catalog.setNodeGauge(nodeInfo, "fs_path_total_bytes", fspath.getTotal().getBytes(), path, mount, type);
+                catalog.setNodeGauge(nodeInfo, "fs_path_available_bytes", fspath.getAvailable().getBytes(), path, mount, type);
+                catalog.setNodeGauge(nodeInfo, "fs_path_free_bytes", fspath.getFree().getBytes(), path, mount, type);
             }
 
             FsInfo.IoStats ioStats = fs.getIoStats();
             if (ioStats != null) {
-                catalog.setNodeGauge("fs_io_total_operations", fs.getIoStats().getTotalOperations());
-                catalog.setNodeGauge("fs_io_total_read_operations", fs.getIoStats().getTotalReadOperations());
-                catalog.setNodeGauge("fs_io_total_write_operations", fs.getIoStats().getTotalWriteOperations());
-                catalog.setNodeGauge("fs_io_total_read_bytes", fs.getIoStats().getTotalReadKilobytes() * 1024);
-                catalog.setNodeGauge("fs_io_total_write_bytes", fs.getIoStats().getTotalWriteKilobytes() * 1024);
+                catalog.setNodeGauge(nodeInfo, "fs_io_total_operations", fs.getIoStats().getTotalOperations());
+                catalog.setNodeGauge(nodeInfo, "fs_io_total_read_operations", fs.getIoStats().getTotalReadOperations());
+                catalog.setNodeGauge(nodeInfo, "fs_io_total_write_operations", fs.getIoStats().getTotalWriteOperations());
+                catalog.setNodeGauge(nodeInfo, "fs_io_total_read_bytes", fs.getIoStats().getTotalReadKilobytes() * 1024);
+                catalog.setNodeGauge(nodeInfo, "fs_io_total_write_bytes", fs.getIoStats().getTotalWriteKilobytes() * 1024);
             }
         }
     }
@@ -899,7 +897,7 @@ public class PrometheusMetricsCollector {
     }
 
     @SuppressWarnings({"checkstyle:LineLength", "checkstyle:LeftCurly"})
-    private void updateESSettings(ClusterStatsData stats) {
+    private void updateESSettings(@Nullable ClusterStatsData stats) {
         if (stats != null) {
             catalog.setClusterGauge("cluster_routing_allocation_disk_threshold_enabled", Boolean.TRUE.equals(stats.getThresholdEnabled()) ? 1 : 0);
             // According to Elasticsearch documentation the following settings must be set either in pct or bytes size.
@@ -916,26 +914,50 @@ public class PrometheusMetricsCollector {
         }
     }
 
-    public void updateMetrics(ClusterHealthResponse clusterHealthResponse, NodeStats nodeStats,
-                              IndicesStatsResponse indicesStats, ClusterStatsData clusterStatsData) {
-        Summary.Timer timer = catalog.startSummaryTimer("metrics_generate_time_seconds");
+    /**
+     * Update all collected metrics from relevant response data.
+     *
+     * Metrics gathering requests were originated on one particular node called "originating" node.
+     *
+     * @param originNodeName            Originating node name.
+     * @param originNodeId              Originating node ID.
+     * @param clusterHealthResponse     ClusterHealthResponse
+     * @param nodeStats                 NodeStats filtered using nodes filter
+     * @param indicesStats              IndicesStatsResponse
+     * @param clusterStatsData          ClusterStatsData
+     */
+    public void updateMetrics(String originNodeName, String originNodeId,
+                              @Nullable ClusterHealthResponse clusterHealthResponse,
+                              NodeStats[] nodeStats,
+                              @Nullable IndicesStatsResponse indicesStats,
+                              @Nullable ClusterStatsData clusterStatsData) {
+        Summary.Timer timer = catalog.startSummaryTimer(
+                new Tuple<>(originNodeName, originNodeId),
+                "metrics_generate_time_seconds");
 
         updateClusterMetrics(clusterHealthResponse);
-        updateNodeMetrics(nodeStats);
-        updateIndicesMetrics(nodeStats.getIndices());
+        for (NodeStats s : nodeStats) {
+            // For each node we create specific context and pass it to all metrics
+            String nodeName = s.getNode().getName();
+            String nodeID = s.getNode().getId();
+            Tuple<String, String> nodeInfo = new Tuple<>(nodeName, nodeID);
+
+            updateNodeMetrics(nodeInfo, s);
+            updateIndicesMetrics(nodeInfo, s.getIndices());
+            updateTransportMetrics(nodeInfo, s.getTransport());
+            updateHTTPMetrics(nodeInfo, s.getHttp());
+            updateThreadPoolMetrics(nodeInfo, s.getThreadPool());
+            updateIngestMetrics(nodeInfo, s.getIngestStats());
+            updateCircuitBreakersMetrics(nodeInfo, s.getBreaker());
+            updateScriptMetrics(nodeInfo, s.getScriptStats());
+            updateProcessMetrics(nodeInfo, s.getProcess());
+            updateJVMMetrics(nodeInfo, s.getJvm());
+            updateOsMetrics(nodeInfo, s.getOs());
+            updateFsMetrics(nodeInfo, s.getFs());
+        }
         if (isPrometheusIndices) {
             updatePerIndexMetrics(clusterHealthResponse, indicesStats);
         }
-        updateTransportMetrics(nodeStats.getTransport());
-        updateHTTPMetrics(nodeStats.getHttp());
-        updateThreadPoolMetrics(nodeStats.getThreadPool());
-        updateIngestMetrics(nodeStats.getIngestStats());
-        updateCircuitBreakersMetrics(nodeStats.getBreaker());
-        updateScriptMetrics(nodeStats.getScriptStats());
-        updateProcessMetrics(nodeStats.getProcess());
-        updateJVMMetrics(nodeStats.getJvm());
-        updateOsMetrics(nodeStats.getOs());
-        updateFsMetrics(nodeStats.getFs());
         if (isPrometheusClusterSettings) {
             updateESSettings(clusterStatsData);
         }
@@ -945,5 +967,9 @@ public class PrometheusMetricsCollector {
 
     public PrometheusMetricsCatalog getCatalog() {
         return catalog;
+    }
+
+    public String getTextContent() throws IOException {
+        return this.catalog.toTextFormat();
     }
 }

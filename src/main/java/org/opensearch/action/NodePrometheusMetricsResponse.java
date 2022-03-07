@@ -18,6 +18,7 @@
 package org.opensearch.action;
 
 import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.opensearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.opensearch.action.admin.cluster.node.stats.NodeStats;
 import org.opensearch.action.admin.cluster.state.ClusterStateResponse;
 import org.opensearch.action.admin.indices.stats.IndicesStatsResponse;
@@ -35,24 +36,29 @@ import java.io.IOException;
  */
 public class NodePrometheusMetricsResponse extends ActionResponse {
     private ClusterHealthResponse clusterHealth;
-    private NodeStats nodeStats;
+    private NodesInfoResponse nodesInfoResponse;
+    private NodeStats[] nodeStats;
     @Nullable private IndicesStatsResponse indicesStats;
     private ClusterStatsData clusterStatsData = null;
 
     public NodePrometheusMetricsResponse(StreamInput in) throws IOException {
         super(in);
         clusterHealth = new ClusterHealthResponse(in);
-        nodeStats = new NodeStats(in);
+        nodesInfoResponse = new NodesInfoResponse(in);
+        nodeStats = in.readArray(NodeStats::new, NodeStats[]::new);
         indicesStats = PackageAccessHelper.createIndicesStatsResponse(in);
         clusterStatsData = new ClusterStatsData(in);
     }
 
-    public NodePrometheusMetricsResponse(ClusterHealthResponse clusterHealth, NodeStats nodesStats,
+    public NodePrometheusMetricsResponse(ClusterHealthResponse clusterHealth,
+                                         NodesInfoResponse localNodesInfoResponse,
+                                         NodeStats[] nodesStats,
                                          @Nullable IndicesStatsResponse indicesStats,
                                          @Nullable ClusterStateResponse clusterStateResponse,
                                          Settings settings,
                                          ClusterSettings clusterSettings) {
         this.clusterHealth = clusterHealth;
+        this.nodesInfoResponse = localNodesInfoResponse;
         this.nodeStats = nodesStats;
         this.indicesStats = indicesStats;
         if (clusterStateResponse != null) {
@@ -64,7 +70,9 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
         return this.clusterHealth;
     }
 
-    public NodeStats getNodeStats() {
+    public NodesInfoResponse getLocalNodesInfoResponse() { return this.nodesInfoResponse; }
+
+    public NodeStats[] getNodeStats() {
         return this.nodeStats;
     }
 
@@ -81,7 +89,8 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
     @Override
     public void writeTo(StreamOutput out) throws IOException {
         clusterHealth.writeTo(out);
-        nodeStats.writeTo(out);
+        nodesInfoResponse.writeTo(out);
+        out.writeArray(nodeStats);
         out.writeOptionalWriteable(indicesStats);
         clusterStatsData.writeTo(out);
     }
