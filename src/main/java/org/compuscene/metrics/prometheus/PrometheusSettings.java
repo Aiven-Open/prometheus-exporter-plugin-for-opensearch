@@ -22,30 +22,36 @@ import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 
 /**
- * A container to keep settings for prometheus up to date with cluster setting changes.
+ * Dynamically updatable Prometheus exporter settings.
  *
- * In order to make the settings dynamically updatable we took some inspiration from implementation
- * and use of DiskThresholdSettings class in OpenSearch.
+ * These settings are part of cluster state available via
+ * <pre>{@code
+ * curl <opensearch>/_cluster/settings?include_defaults=true&filter_path=defaults.prometheus
+ * }</pre>
  */
 public class PrometheusSettings {
 
-    // These settings are part of cluster state available via HTTP at
-    // curl <opensearch>/_cluster/settings?include_defaults=true&filter_path=defaults.prometheus
     public static final Setting<Boolean> PROMETHEUS_CLUSTER_SETTINGS =
             Setting.boolSetting("prometheus.cluster.settings", true,
                     Setting.Property.Dynamic, Setting.Property.NodeScope);
     public static final Setting<Boolean> PROMETHEUS_INDICES =
             Setting.boolSetting("prometheus.indices", true,
                     Setting.Property.Dynamic, Setting.Property.NodeScope);
+    public static final Setting<String> PROMETHEUS_NODES_FILTER =
+            Setting.simpleString("prometheus.nodes.filter", "_local",
+                    Setting.Property.Dynamic, Setting.Property.NodeScope);
 
     private volatile boolean clusterSettings;
     private volatile boolean indices;
+    private volatile String nodesFilter;
 
     public PrometheusSettings(Settings settings, ClusterSettings clusterSettings) {
         setPrometheusClusterSettings(PROMETHEUS_CLUSTER_SETTINGS.get(settings));
         setPrometheusIndices(PROMETHEUS_INDICES.get(settings));
+        setPrometheusNodesFilter(PROMETHEUS_NODES_FILTER.get(settings));
         clusterSettings.addSettingsUpdateConsumer(PROMETHEUS_CLUSTER_SETTINGS, this::setPrometheusClusterSettings);
         clusterSettings.addSettingsUpdateConsumer(PROMETHEUS_INDICES, this::setPrometheusIndices);
+        clusterSettings.addSettingsUpdateConsumer(PROMETHEUS_NODES_FILTER, this::setPrometheusNodesFilter);
     }
 
     private void setPrometheusClusterSettings(boolean flag) {
@@ -56,6 +62,8 @@ public class PrometheusSettings {
         this.indices = flag;
     }
 
+    private void setPrometheusNodesFilter(String filter) { this.nodesFilter = filter; }
+
     public boolean getPrometheusClusterSettings() {
         return this.clusterSettings;
     }
@@ -63,4 +71,6 @@ public class PrometheusSettings {
     public boolean getPrometheusIndices() {
         return this.indices;
     }
+
+    public String getNodesFilter() { return this.nodesFilter; }
 }

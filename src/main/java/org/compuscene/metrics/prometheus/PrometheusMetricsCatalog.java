@@ -19,6 +19,7 @@ package org.compuscene.metrics.prometheus;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.common.collect.Tuple;
 import org.opensearch.rest.prometheus.RestPrometheusMetricsAction;
 
 import java.io.IOException;
@@ -39,21 +40,19 @@ public class PrometheusMetricsCatalog {
     private static final Logger logger = LogManager.getLogger(RestPrometheusMetricsAction.class);
 
     private String clusterName;
-    private String nodeName;
-    private String nodeId;
-
     private String metricPrefix;
 
     private HashMap<String, Object> metrics;
     private CollectorRegistry registry;
 
-    public PrometheusMetricsCatalog(String clusterName, String nodeName, String nodeId, String metricPrefix) {
+    /**
+     *
+     * @param clusterName   ame of the OpenSearch cluster
+     * @param metricPrefix  A value that is automatically used as a prefix for all registered and set metrics
+     */
+    public PrometheusMetricsCatalog(String clusterName, String metricPrefix) {
         this.clusterName = clusterName;
-        this.nodeName = nodeName;
-        this.nodeId = nodeId;
-
         this.metricPrefix = metricPrefix;
-
         metrics = new HashMap<>();
         registry = new CollectorRegistry();
     }
@@ -87,11 +86,18 @@ public class PrometheusMetricsCatalog {
         return extended;
     }
 
-    private String[] getExtendedNodeLabelValues(String... labelValues) {
+    /**
+     * @param nodeInfo      {@link Tuple} holding [nodeName, nodeID]
+     * @param labelValues   Prometheus label values
+     * @return Prometheus label values extended with cluster and specific node context
+     */
+    private String[] getExtendedNodeLabelValues(
+            Tuple<String, String> nodeInfo,
+            String... labelValues) {
         String[] extended = new String[labelValues.length + 3];
         extended[0] = clusterName;
-        extended[1] = nodeName;
-        extended[2] = nodeId;
+        extended[1] = nodeInfo.v1();
+        extended[2] = nodeInfo.v2();
 
         System.arraycopy(labelValues, 0, extended, 3, labelValues.length);
 
@@ -127,9 +133,11 @@ public class PrometheusMetricsCatalog {
         logger.debug(String.format(Locale.ENGLISH, "Registered new node gauge %s", metric));
     }
 
-    public void setNodeGauge(String metric, double value, String... labelValues) {
+    public void setNodeGauge(Tuple<String, String> nodeInfo,
+                             String metric, double value,
+                             String... labelValues) {
         Gauge gauge = (Gauge) metrics.get(metric);
-        gauge.labels(getExtendedNodeLabelValues(labelValues)).set(value);
+        gauge.labels(getExtendedNodeLabelValues(nodeInfo, labelValues)).set(value);
     }
 
     public void registerSummaryTimer(String metric, String help, String... labels) {
@@ -144,9 +152,10 @@ public class PrometheusMetricsCatalog {
         logger.debug(String.format(Locale.ENGLISH, "Registered new summary %s", metric));
     }
 
-    public Summary.Timer startSummaryTimer(String metric, String... labelValues) {
+    public Summary.Timer startSummaryTimer(Tuple<String, String> nodeInfo, String metric,
+                                           String... labelValues) {
         Summary summary = (Summary) metrics.get(metric);
-        return summary.labels(getExtendedNodeLabelValues(labelValues)).startTimer();
+        return summary.labels(getExtendedNodeLabelValues(nodeInfo, labelValues)).startTimer();
     }
 
     public String toTextFormat() throws IOException {

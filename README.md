@@ -26,9 +26,10 @@ This plugin is based on [Prometheus exporter for Elasticsearch®](https://github
 |-----------:|--------:|-------------:|
 |      1.3.0 | 1.3.0.0 |          TBD |
 |      1.2.5 | 1.2.5.0 |          TBD |
-|   <= 1.2.4 |     (*) |          (*) |
+|      1.2.4 | 1.2.4.0 |          TBD |
+|   <= 1.2.3 |     (*) |          (*) |
 
-(*) If you are looking for plugin releases supporting earlier (`<= 1.2.4`) OpenSearch version please visit
+(*) If you are looking for plugin releases supporting earlier (`<= 1.2.3`) OpenSearch version please visit
 <https://github.com/aparo/opensearch-prometheus-exporter/releases>.
 
 ## Install
@@ -45,6 +46,8 @@ Start OpenSearch cluster.
 
 ### Static settings
 
+Static settings are configured in `config/opensearch.yml`.
+
 #### Metric name prefix
 
 All metric names share common prefix, by default set to `opensearch_`.
@@ -56,10 +59,14 @@ prometheus.metric_name.prefix: "opensearch_"
 
 ### Dynamic settings
 
+Dynamic settings are configured in `config/opensearch.yml` but they can also [updated](https://opensearch.org/docs/latest/opensearch/configuration/#update-cluster-settings-using-the-api) at any time via REST API.
+
 #### Index level metrics
 
+Whether to export detailed index level metrics or not. Default value: `true`.
+
 Detailed index level metrics can represent a lot of data and can lead to high-cardinality labels in Prometheus.
-If you do not need detailed index level metrics it is recommended to disable it via setting:
+If you do not need detailed index level metrics **it is recommended to disable it** via setting:
 
 ```
 prometheus.indices: false
@@ -72,7 +79,18 @@ To disable exporting cluster settings use:
 prometheus.cluster.settings: false
 ```
 
-Both these settings can be [updated dynamically](https://opensearch.org/docs/latest/opensearch/configuration/#update-cluster-settings-using-the-api).
+#### Nodes filter
+
+Metrics include statistics about individual OpenSearch nodes.
+By default, only statistics from the node that received the request are included.
+
+Prometheus exporter can be configured to include statistics from other nodes as well.
+Default value: `"_local"`.
+
+For example to get stats for all cluster nodes from any node use settings:
+```
+prometheus.nodes.filter: "_all"
+```
 
 ## Uninstall
 
