@@ -25,20 +25,16 @@ This plugin is based on [Prometheus exporter for Elasticsearch®](https://github
 | OpenSearch |  Plugin | Release date |
 |-----------:|--------:|-------------:|
 |      1.3.0 | 1.3.0.0 |          TBD |
-|      1.2.5 | 1.2.5.0 |          TBD |
-|      1.2.4 | 1.2.4.0 |          TBD |
-|   <= 1.2.3 |     (*) |          (*) |
+|   <= 1.2.4 |     (*) |          (*) |
 
-(*) If you are looking for plugin releases supporting earlier (`<= 1.2.3`) OpenSearch version please visit
+(*) If you are looking for plugin releases supporting earlier (`<= 1.2.4`) OpenSearch version please visit
 <https://github.com/aparo/opensearch-prometheus-exporter/releases>.
 
 ## Install
 
 Before you start OpenSearch cluster install the plugin on each cluster node that will be scraped by Prometheus:
 
-_Notice: the URL location is temporary for now._ 
-
-`./bin/opensearch-plugin install https://github.com/TBD/prometheus-exporter/releases/download/1.3.0.0/prometheus-exporter-1.3.0.0.zip`
+`./bin/opensearch-plugin install https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/releases/download/1.3.0.0/prometheus-exporter-1.3.0.0.zip`
 
 Start OpenSearch cluster.
 
