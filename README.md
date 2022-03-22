@@ -165,7 +165,7 @@ framework.
 
 Complete test suite is run using:
 ```
-./gradlew clean check
+./gradlew clean assemble check
 ```
 
 To run individual integration rest test file use:
