@@ -24,7 +24,7 @@ This plugin is based on [Prometheus exporter for Elasticsearch®](https://github
 
 | OpenSearch |  Plugin | Release date |
 |-----------:|--------:|-------------:|
-|      1.3.0 | 1.3.0.0 |          TBD |
+|      1.3.0 | 1.3.0.0 | Mar 22, 2022 |
 |   <= 1.2.4 |     (*) |          (*) |
 
 (*) If you are looking for plugin releases supporting earlier (`<= 1.2.4`) OpenSearch version please visit
