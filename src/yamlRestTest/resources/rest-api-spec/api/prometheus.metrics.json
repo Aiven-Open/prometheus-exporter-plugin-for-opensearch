@@ -1,7 +1,7 @@
 {
   "prometheus.metrics": {
     "documentation":{
-      "url":"https://github.com/TBD/prometheus-exporter/"
+      "url":"https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/"
     },
     "stability": "stable",
     "url":{
