@@ -2,7 +2,23 @@
 
 The [Prometheus® exporter](https://prometheus.io/docs/instrumenting/writing_exporters/) plugin for OpenSearch® exposes many OpenSearch metrics in [Prometheus format](https://prometheus.io/docs/instrumenting/exposition_formats/).
 
-This plugin is based on [Prometheus exporter for Elasticsearch®](https://github.com/vvanholl/elasticsearch-prometheus-exporter) and all the great work the community has done. The plugin was forked in version 7.10.2.0 (commit hash: [8dc7f85](https://github.com/vvanholl/elasticsearch-prometheus-exporter/commit/8dc7f85109fe1601a68010e9de598a9b131afd02)) which is the latest when Elasticsearch was still using AL2 and has been developed independently since then.
+- [Introduction](#introduction)
+- [Compatibility Matrix](#compatibility-matrix)
+- [Install or Remove Plugin](#install-or-remove-plugin)
+- [Plugin Configuration](#plugin-configuration)
+  - [Static settings](#static-settings) 
+  - [Dynamic settings](#dynamic-settings) 
+- [Usage](#usage)
+- [Build from Source](#build-from-source)
+- [Testing](#testing)
+- [License](#license)
+- [Trademarks & Attributions](#trademarks--attributions)
+
+---
+
+## Introduction
+
+This plugin was started as a fork of [Prometheus exporter for Elasticsearch®](https://github.com/vvanholl/elasticsearch-prometheus-exporter) (it was forked in version 7.10.2.0; commit hash: [8dc7f85](https://github.com/vvanholl/elasticsearch-prometheus-exporter/commit/8dc7f85109fe1601a68010e9de598a9b131afd02)) utilizing [OpenSearch plugin template](https://github.com/opensearch-project/opensearch-plugin-template-java). It uses the official [Prometheus Java Simpleclient](https://github.com/prometheus/client_java/tree/master/simpleclient).
 
 **Currently, the available metrics are:**
 
@@ -20,25 +36,31 @@ This plugin is based on [Prometheus exporter for Elasticsearch®](https://github
 - Indices status
 - Cluster settings (notably [disk watermarks](https://opensearch.org/docs/latest/opensearch/popular-api/#change-disk-watermarks-or-other-cluster-settings) that can be updated dynamically)
 
-## Compatibility matrix
+## Compatibility Matrix
 
 | OpenSearch |  Plugin | Release date |
 |-----------:|--------:|-------------:|
 |      1.3.0 | 1.3.0.0 | Mar 22, 2022 |
 |   <= 1.2.4 |     (*) |          (*) |
 
-(*) If you are looking for plugin releases supporting earlier (`<= 1.2.4`) OpenSearch version please visit
-<https://github.com/aparo/opensearch-prometheus-exporter/releases>.
+_(*) If you are looking for plugin releases supporting earlier (`<= 1.2.4`) OpenSearch versions please visit
+<https://github.com/aparo/opensearch-prometheus-exporter/releases>._
 
-## Install
+## Install or Remove Plugin
 
-Before you start OpenSearch cluster install the plugin on each cluster node that will be scraped by Prometheus:
+You need to install the plugin on every OpenSearch node that will be scraped by Prometheus.
+
+To **install** the plugin:
 
 `./bin/opensearch-plugin install https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/releases/download/1.3.0.0/prometheus-exporter-1.3.0.0.zip`
 
-Start OpenSearch cluster.
+To **remove** the plugin.
 
-## Plugin configuration
+`./bin/opensearch-plugin remove prometheus-exporter`
+
+For more info about plugin CLI, visit: <https://opensearch.org/docs/latest/opensearch/install/plugins/>
+
+## Plugin Configuration
 
 ### Static settings
 
@@ -55,7 +77,7 @@ prometheus.metric_name.prefix: "opensearch_"
 
 ### Dynamic settings
 
-Dynamic settings are configured in `config/opensearch.yml` but they can also [updated](https://opensearch.org/docs/latest/opensearch/configuration/#update-cluster-settings-using-the-api) at any time via REST API.
+Dynamic settings are configured in `config/opensearch.yml` but they can also be [updated](https://opensearch.org/docs/latest/opensearch/configuration/#update-cluster-settings-using-the-api) at any time via REST API.
 
 #### Index level metrics
 
@@ -87,14 +109,6 @@ For example to get stats for all cluster nodes from any node use settings:
 ```
 prometheus.nodes.filter: "_all"
 ```
-
-## Uninstall
-
-You need to remove the plugin from all nodes where it was installed.
-
-`./bin/opensearch-plugin remove prometheus-exporter`
-
-Do not forget to restart the node after installation.
 
 ## Usage
 
@@ -148,7 +162,7 @@ Of course, you could use the service discovery service instead of a static confi
 
 Just keep in mind that `metrics_path` must be `/_prometheus/metrics`, otherwise Prometheus will find no metric.
 
-## Build from source
+## Build from Source
 
 To build the plugin you need JDK 14:
 
@@ -173,10 +187,6 @@ To run individual integration rest test file use:
 ./gradlew :yamlRestTest \
   -Dtests.method="test {yaml=/20_11_index_level_metrics_disabled/Dynamically disable index level metrics}"
 ```
-
-## Credits
-
-This plugin mainly uses the [Prometheus JVM Client](https://github.com/prometheus/client_java).
 
 ## License
 
