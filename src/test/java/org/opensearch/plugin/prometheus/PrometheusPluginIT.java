@@ -43,6 +43,6 @@ public class PrometheusPluginIT extends OpenSearchIntegTestCase {
         String body = EntityUtils.toString(response.getEntity());
 
         logger.info("response body: {}", body);
-        assertThat(body, containsString("prometheus-exporter"));
+        org.hamcrest.MatcherAssert.assertThat(body, containsString("prometheus-exporter"));
     }
 }

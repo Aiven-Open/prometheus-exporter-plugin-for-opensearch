@@ -86,6 +86,11 @@ test {
     include '**/*Tests.class'
 }
 
+// Print more details if any deprecated APIs are used
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-Xlint:deprecation']
+}
+
 task integTest(type: RestIntegTestTask) {
     description = "Run tests against a cluster"
     testClassesDirs = sourceSets.test.output.classesDirs
