@@ -45,7 +45,7 @@
         \# \s TYPE \s opensearch_index_segments_memory_bytes \s gauge \n
         (
           opensearch_index_segments_memory_bytes\{
-              cluster="yamlRestTest",type="(all|bitset|docvalues|indexwriter|norms|storefields|terms|termvectors|versionmap|points)",index="twitter",context="(primaries|total)"
+              cluster="yamlRestTest",type="(bitset|indexwriter|versionmap)",index="twitter",context="(primaries|total)"
           ,\} \s+ \d+\.\d+ \n?
-        ){20}
+        ){6}
         .*/
