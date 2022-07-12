@@ -59,6 +59,7 @@ buildscript {
         String opensearch_version
         String plugin_version = version
 
+
         Matcher rc_matcher = RC_pattern.matcher(plugin_version)
         Matcher other_matcher = OTHER_pattern.matcher(plugin_version)
 
@@ -85,7 +86,6 @@ buildscript {
         maven { url "https://aws.oss.sonatype.org/content/repositories/snapshots" }
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
-        jcenter()
     }
 
     dependencies {
