@@ -8,15 +8,15 @@ The main goal of the release process is a new commit in either `main` or other r
 
 ## Release Process Steps
 
-1. \[Optional\] Upgrade OpenSearch to a new version
-2. Open a new ticket with release checklist
-3. Create and push the release commit
-4. \[Optional\] Update Compatibility Matrix in the main branch
-5. Prepare new release draft on GitHub
-6. Build release artifacts and upload them
-7. Verify that the artifacts work with OpenSearch
-8. Write release notes and publish the release on GitHub 
-9. \[Optional\] OpenSearch forum announcement
+1. [\[Optional\] Upgrade OpenSearch to a new version](RELEASE_PROCESS.md#1-optional-upgrade-opensearch-to-a-new-version)
+2. [Open a new ticket with release checklist](RELEASE_PROCESS.md#2-open-a-new-ticket-with-release-checklist)
+3. [Create and push the release commit](RELEASE_PROCESS.md#3-create-and-push-the-release-commit)
+4. [\[Optional\] Update Compatibility Matrix in the main branch](RELEASE_PROCESS.md#4-optional-update-compatibility-matrix-in-the-main-branch)
+5. [Prepare new release draft on GitHub](RELEASE_PROCESS.md#5-prepare-new-release-draft-on-github)
+6. [Build release artifacts and upload them](RELEASE_PROCESS.md#6-build-release-artifacts-and-upload-them)
+7. [Verify that the artifacts work with OpenSearch](RELEASE_PROCESS.md#7-verify-that-the-artifacts-work-with-opensearch)
+8. [Write release notes and publish the release on GitHub](RELEASE_PROCESS.md#8-write-release-notes-and-publish-the-release-on-github) 
+9. [\[Optional\] OpenSearch forum announcement](RELEASE_PROCESS.md#9-optional-opensearch-forum-announcement)
 
 ## Detailed instructions
 
@@ -26,13 +26,13 @@ If the release includes upgrade to a new version of OpenSearch it is recommended
 
 This is only to make sure that if the upgrade will need to be reverted then we will not have to delete any git tags or otherwise manipulate public git repo history.
 
-PR example: https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/pull/62
+- PR example: https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/pull/62
 
 ### 2. Open a new ticket with release checklist
 
 It is helpful to track individual release steps. A good practice is opening a new ticket with the checklist and update it during the process to make sure nothing is forgotten and that steps are happening in correct order.
 
-Ticket example: https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/issues/61
+- Ticket example: https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/issues/61
 
 ### 3. Create and push the release commit
 
@@ -62,7 +62,7 @@ Notice that the commit must be `signed` (it is requirement of our [Contribution 
 
 When opening the PR pay attention to target branch. If you prepare release for older version of the plugin the chance is that it will not go against the `main` branch but against different branch (such as `v1.3` or similar).
 
-Example of commit: https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/pull/63
+- Example of commit: https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/pull/63
 
 If this commit passes CI tests and is merged then **the repo admin will create a new release tag** for it and push that tag into repo (`upstream` is the repo under the Aiven GitHub org).
 
@@ -91,7 +91,7 @@ When doing releases of older versions of the plugin it can happen that the Compa
 
 Prepare new Release Draft based on the new release tag.
 
-Tip: Get some inspiration from our [past releases](https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/releases).
+- Tip: Get some inspiration from our [past releases](https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/releases).
 
 ### 6. Build release artifacts and upload them
 
@@ -138,7 +138,7 @@ If the testing went fine, you write release notes and publish the release.
 
 Let the community know. Create a new announcement in `OpenSearch` category and do not forget to add `releases` tag.
 
-Example: https://forum.opensearch.org/t/prometheus-exporter-plugin-1-3-3-0-released/9936
+- Example: https://forum.opensearch.org/t/prometheus-exporter-plugin-1-3-3-0-released/9936
 
 ## Done!
 
