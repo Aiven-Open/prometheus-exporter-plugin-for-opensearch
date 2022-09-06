@@ -17,7 +17,7 @@
 
 package org.opensearch.action;
 
-import org.opensearch.action.support.master.MasterNodeReadRequest;
+import org.opensearch.action.support.clustermanager.ClusterManagerNodeReadRequest;
 import org.opensearch.common.io.stream.StreamInput;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.io.IOException;
 /**
  * Action request class for Prometheus Exporter plugin.
  */
-public class NodePrometheusMetricsRequest extends MasterNodeReadRequest<NodePrometheusMetricsRequest> {
+public class NodePrometheusMetricsRequest extends ClusterManagerNodeReadRequest<NodePrometheusMetricsRequest> {
 
     public NodePrometheusMetricsRequest() {
         super();
