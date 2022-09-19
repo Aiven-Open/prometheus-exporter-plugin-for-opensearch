@@ -109,7 +109,7 @@ $ cat .github/workflows/CI.yml | yq .jobs.build.strategy.matrix.java
 Build the artifacts:
 
 ```shell
-$ .gradlew clean build
+$ ./gradlew clean build
 ```
 You will find final artifact (the ZIP archive) in the following location:
 
