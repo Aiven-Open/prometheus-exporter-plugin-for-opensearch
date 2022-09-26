@@ -1,0 +1,37 @@
+# intellij files
+.idea/
+*.iml
+*.ipr
+*.iws
+build-idea/
+out/
+
+# include shared intellij config
+!.idea/inspectionProfiles/Project_Default.xml
+!.idea/runConfigurations/Debug_OpenSearch.xml
+
+# eclipse files
+.project
+.classpath
+.settings
+build-eclipse/
+
+# netbeans files
+nb-configuration.xml
+nbactions.xml
+
+# vscode stuff
+.vscode/
+
+# osx stuff
+.DS_Store
+
+# random old stuff that we should look at the necessity of...
+/tmp/
+eclipse-build
+
+# Jsonnet resources
+*.yaml
+distribution
+vendor
+jsonnetfile.lock.json
