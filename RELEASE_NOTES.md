@@ -26,4 +26,3 @@ Release date: TBD
 
 - Cluster status chart does not correctly display the cluster health (ie: Green, Yellow, Red).
 - Node DiskWatermark alerts use static thresholds value while they should be using node settings value exposed in metric (see [relevant issue](https://github.com/lukas-vlcek/elasticsearch-mixin/issues/5)).
-- CI workflow is not working correctly.

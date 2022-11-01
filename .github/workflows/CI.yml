@@ -1,30 +1,27 @@
-name: Build and Test Mixin
+name: Generate Mixin
 
 on:
   push:
     branches:
-      - "*"
+      - "mixin*"
   pull_request:
     branches:
-      - "*"
+      - "mixin*"
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        java: [14]
-    name: Build and Test Mixin
+  generate:
+    name: Generate Mixin
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK ${{ matrix.java }}
-      uses: actions/setup-java@v1
+    - uses: actions/checkout@v3
       with:
-        java-version: ${{ matrix.java }}
+        ref: mixin
+    - uses: Homebrew/actions/setup-homebrew@master
 
-    - name: Build and Run Tests
+    - name: Install jsonnet, jsonnet-bundler & promtool
       run: |
-          ./gradlew --info build
+        brew install jsonnet jsonnet-bundler prometheus
+
+    - name: Run Make
+      run: |
+        ./make clean & make
