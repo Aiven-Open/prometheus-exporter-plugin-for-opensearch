@@ -40,6 +40,7 @@ This plugin was started as a fork of [Prometheus exporter for Elasticsearch®](h
 
 | OpenSearch |      Plugin |  Release date |
 |-----------:|------------:|--------------:|
+|      2.4.0 |     2.4.0.0 |  Nov 18, 2022 |
 |      2.3.0 |     2.3.0.0 |  Sep 19, 2022 |
 |      2.2.1 |     2.2.1.0 |  Sep  5, 2022 |
 |      2.2.0 |     2.2.0.0 |  Aug 13, 2022 |
@@ -65,7 +66,7 @@ You need to install the plugin on every OpenSearch node that will be scraped by 
 
 To **install** the plugin:
 
-`./bin/opensearch-plugin install https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/releases/download/2.3.0.0/prometheus-exporter-2.3.0.0.zip`
+`./bin/opensearch-plugin install https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/releases/download/2.4.0.0/prometheus-exporter-2.4.0.0.zip`
 
 To **remove** the plugin.
 
