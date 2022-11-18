@@ -54,6 +54,10 @@ public class RestPrometheusMetricsAction extends BaseRestHandler {
             );
         }
     };
+
+    /**
+     * A metric prefix. Can be configured in opensearch.yml file under key {@link #METRIC_PREFIX_KEY}.
+     */
     public static final Setting<String> METRIC_PREFIX = Setting.simpleString(METRIC_PREFIX_KEY, "opensearch_", indexPrefixValidator, Setting.Property.NodeScope);
 
 
@@ -61,6 +65,11 @@ public class RestPrometheusMetricsAction extends BaseRestHandler {
     private final PrometheusSettings prometheusSettings;
     private final Logger logger = LogManager.getLogger(getClass());
 
+    /**
+     * A constructor.
+     * @param settings Settings
+     * @param clusterSettings Cluster settings
+     */
     public RestPrometheusMetricsAction(Settings settings, ClusterSettings clusterSettings) {
         this.prometheusSettings = new PrometheusSettings(settings, clusterSettings);
         this.metricPrefix = METRIC_PREFIX.get(settings);

@@ -33,14 +33,21 @@ import java.io.IOException;
 
 /**
  * Action response class for Prometheus Exporter plugin.
+ * This class a container of other responses that are needed to construct list of all required metrics. It knows how to
+ * prepare all data for wire transport by writing it into outputStream.
  */
 public class NodePrometheusMetricsResponse extends ActionResponse {
-    private ClusterHealthResponse clusterHealth;
-    private NodesInfoResponse nodesInfoResponse;
-    private NodeStats[] nodeStats;
-    @Nullable private IndicesStatsResponse indicesStats;
+    private final ClusterHealthResponse clusterHealth;
+    private final NodesInfoResponse nodesInfoResponse;
+    private final NodeStats[] nodeStats;
+    @Nullable private final IndicesStatsResponse indicesStats;
     private ClusterStatsData clusterStatsData = null;
 
+    /**
+     * A constructor that materialize the instance from inputStream.
+     * @param in inputStream
+     * @throws IOException if there is an exception reading from inputStream
+     */
     public NodePrometheusMetricsResponse(StreamInput in) throws IOException {
         super(in);
         clusterHealth = new ClusterHealthResponse(in);
@@ -50,6 +57,16 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
         clusterStatsData = new ClusterStatsData(in);
     }
 
+    /**
+     * A constructor.
+     * @param clusterHealth ClusterHealthResponse
+     * @param localNodesInfoResponse NodesInfoResponse
+     * @param nodesStats NodesStats
+     * @param indicesStats IndicesStats
+     * @param clusterStateResponse ClusterStateResponse
+     * @param settings Settings
+     * @param clusterSettings ClusterSettings
+     */
     public NodePrometheusMetricsResponse(ClusterHealthResponse clusterHealth,
                                          NodesInfoResponse localNodesInfoResponse,
                                          NodeStats[] nodesStats,
@@ -66,21 +83,41 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
         }
     }
 
+    /**
+     * Get internal {@link ClusterHealthResponse} object.
+     * @return ClusterHealthResponse object
+     */
     public ClusterHealthResponse getClusterHealth() {
         return this.clusterHealth;
     }
 
+    /**
+     * Get internal {@link NodesInfoResponse} object.
+     * @return NodesInfoResponse object
+     */
     public NodesInfoResponse getLocalNodesInfoResponse() { return this.nodesInfoResponse; }
 
+    /**
+     * Get internal {@link NodeStats} array.
+     * @return NodeStats array
+     */
     public NodeStats[] getNodeStats() {
         return this.nodeStats;
     }
 
+    /**
+     * Get internal {@link IndicesStatsResponse} object.
+     * @return IndicesStatsResponse object
+     */
     @Nullable
     public IndicesStatsResponse getIndicesStats() {
         return this.indicesStats;
     }
 
+    /**
+     * Get internal {@link ClusterStatsData} object.
+     * @return ClusterStatsData object
+     */
     @Nullable
     public ClusterStatsData getClusterStatsData() {
         return this.clusterStatsData;

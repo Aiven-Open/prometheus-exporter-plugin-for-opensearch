@@ -56,6 +56,12 @@ public class PrometheusMetricsCollector {
     private boolean isPrometheusIndices;
     private PrometheusMetricsCatalog catalog;
 
+    /**
+     * A constructor.
+     * @param catalog {@link PrometheusMetricsCatalog}
+     * @param isPrometheusIndices boolean flag for index level metric
+     * @param isPrometheusClusterSettings boolean flag cluster settings metrics
+     */
     public PrometheusMetricsCollector(PrometheusMetricsCatalog catalog,
                                       boolean isPrometheusIndices,
                                       boolean isPrometheusClusterSettings) {
@@ -64,6 +70,9 @@ public class PrometheusMetricsCollector {
         this.catalog = catalog;
     }
 
+    /**
+     * Call this method to register all the metrics that we want to capture.
+     */
     public void registerMetrics() {
         catalog.registerSummaryTimer("metrics_generate_time_seconds", "Time spent while generating metrics");
 
@@ -951,10 +960,19 @@ public class PrometheusMetricsCollector {
         timer.observeDuration();
     }
 
+    /**
+     * Get the metric catalog.
+     * @return The catalog
+     */
     public PrometheusMetricsCatalog getCatalog() {
         return catalog;
     }
 
+    /**
+     * @see PrometheusMetricsCatalog#toTextFormat()
+     * @return A text representation of the catalog
+     * @throws IOException If creating the text representation goes wrong
+     */
     public String getTextContent() throws IOException {
         return this.catalog.toTextFormat();
     }

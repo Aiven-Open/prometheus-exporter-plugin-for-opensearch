@@ -67,6 +67,11 @@ public class ClusterStatsData extends ActionResponse {
     private Double[] diskHighInPctRef = new Double[]{diskHighInPct};
     private Double[] floodStageInPctRef = new Double[]{floodStageInPct};
 
+    /**
+     * A constructor.
+     * @param in A streamInput to materialize the instance from
+     * @throws IOException if reading from streamInput is not successful
+     */
     public ClusterStatsData(StreamInput in) throws IOException {
         super(in);
         thresholdEnabled = in.readOptionalBoolean();
@@ -87,6 +92,7 @@ public class ClusterStatsData extends ActionResponse {
         // There are several layers of cluster settings in Elasticsearch each having different priority.
         // We need to traverse them from the top priority down to find relevant value of each setting.
         // See https://www.elastic.co/guide/en/elasticsearch/reference/master/cluster-update-settings.html#_order_of_precedence
+        // TODO[lukas-vlcek]: update to OpenSearch referenced
         for (Settings s : new Settings[]{
                 // See: RestClusterGetSettingsAction#response
                 // or: https://github.com/elastic/elasticsearch/pull/33247/files
@@ -152,35 +158,63 @@ public class ClusterStatsData extends ActionResponse {
         out.writeOptionalDouble(floodStageInPct);
     }
 
+    /**
+     * Get value of setting controlled by {@link org.opensearch.cluster.routing.allocation.DiskThresholdSettings#CLUSTER_ROUTING_ALLOCATION_DISK_THRESHOLD_ENABLED_SETTING}.
+     * @return A Boolean value of the setting.
+     */
     public Boolean getThresholdEnabled() {
         return thresholdEnabled;
     }
 
+    /**
+     * Get value of setting controlled by {@link org.opensearch.cluster.routing.allocation.DiskThresholdSettings#CLUSTER_ROUTING_ALLOCATION_LOW_DISK_WATERMARK_SETTING}.
+     * @return A Long value of the setting.
+     */
     @Nullable
     public Long getDiskLowInBytes() {
         return diskLowInBytes;
     }
 
+    /**
+     * Get value of setting controlled by {@link org.opensearch.cluster.routing.allocation.DiskThresholdSettings#CLUSTER_ROUTING_ALLOCATION_HIGH_DISK_WATERMARK_SETTING}.
+     * @return A Long value of the setting.
+     */
     @Nullable
     public Long getDiskHighInBytes() {
         return diskHighInBytes;
     }
 
+    /**
+     * Get value of setting controlled by {@link org.opensearch.cluster.routing.allocation.DiskThresholdSettings#CLUSTER_ROUTING_ALLOCATION_DISK_FLOOD_STAGE_WATERMARK_SETTING}.
+     * @return A Long value of the setting.
+     */
     @Nullable
     public Long getFloodStageInBytes() {
         return floodStageInBytes;
     }
 
+    /**
+     * Get value of setting controlled by {@link org.opensearch.cluster.routing.allocation.DiskThresholdSettings#CLUSTER_ROUTING_ALLOCATION_LOW_DISK_WATERMARK_SETTING}.
+     * @return A Double value of the setting.
+     */
     @Nullable
     public Double getDiskLowInPct() {
         return diskLowInPct;
     }
 
+    /**
+     * Get value of setting controlled by {@link org.opensearch.cluster.routing.allocation.DiskThresholdSettings#CLUSTER_ROUTING_ALLOCATION_HIGH_DISK_WATERMARK_SETTING}.
+     * @return A Double value of the setting.
+     */
     @Nullable
     public Double getDiskHighInPct() {
         return diskHighInPct;
     }
 
+    /**
+     * Get value of setting controlled by {@link org.opensearch.cluster.routing.allocation.DiskThresholdSettings#CLUSTER_ROUTING_ALLOCATION_DISK_FLOOD_STAGE_WATERMARK_SETTING}.
+     * @return A Double value of the setting.
+     */
     @Nullable
     public Double getFloodStageInPct() {
         return floodStageInPct;

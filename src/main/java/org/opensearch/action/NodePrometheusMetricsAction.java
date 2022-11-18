@@ -21,7 +21,14 @@ package org.opensearch.action;
  */
 public class NodePrometheusMetricsAction extends ActionType<NodePrometheusMetricsResponse> {
 
+    /**
+     * An action singleton instance at the node level.
+     */
     public static final NodePrometheusMetricsAction INSTANCE = new NodePrometheusMetricsAction();
+
+    /**
+     * A privilege that users need to have to be allowed to request metrics from plugin REST endpoint.
+     */
     public static final String NAME = "cluster:monitor/prometheus/metrics";
 
     private NodePrometheusMetricsAction() {
