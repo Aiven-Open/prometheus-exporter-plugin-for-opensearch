@@ -46,6 +46,9 @@ import java.util.function.Supplier;
 public class PrometheusExporterPlugin extends Plugin implements ActionPlugin {
     private static final Logger logger = LogManager.getLogger(PrometheusExporterPlugin.class);
 
+    /**
+     * A constructor.
+     */
     public PrometheusExporterPlugin() {
         logger.info("starting Prometheus exporter plugin");
     }

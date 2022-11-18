@@ -31,20 +31,43 @@ import org.opensearch.common.settings.Settings;
  */
 public class PrometheusSettings {
 
+    static String PROMETHEUS_CLUSTER_SETTINGS_KEY = "prometheus.cluster.settings";
+    static String PROMETHEUS_INDICES_KEY = "prometheus.indices";
+    static String PROMETHEUS_NODES_FILTER_KEY = "prometheus.nodes.filter";
+
+    /**
+     * This setting is used configure weather to expose cluster settings metrics or not. The default value is true.
+     * Can be configured in opensearch.yml file or update dynamically under key {@link #PROMETHEUS_CLUSTER_SETTINGS_KEY}.
+     */
     public static final Setting<Boolean> PROMETHEUS_CLUSTER_SETTINGS =
-            Setting.boolSetting("prometheus.cluster.settings", true,
+            Setting.boolSetting(PROMETHEUS_CLUSTER_SETTINGS_KEY, true,
                     Setting.Property.Dynamic, Setting.Property.NodeScope);
+
+    /**
+     * This setting is used configure weather to expose low level index metrics or not. The default value is true.
+     * Can be configured in opensearch.yml file or update dynamically under key {@link #PROMETHEUS_INDICES_KEY}.
+     */
     public static final Setting<Boolean> PROMETHEUS_INDICES =
-            Setting.boolSetting("prometheus.indices", true,
+            Setting.boolSetting(PROMETHEUS_INDICES_KEY, true,
                     Setting.Property.Dynamic, Setting.Property.NodeScope);
+
+    /**
+     * This setting is used configure which cluster nodes to gather metrics from. The default value is _local.
+     * Can be configured in opensearch.yml file or update dynamically under key {@link #PROMETHEUS_NODES_FILTER_KEY}.
+     */
     public static final Setting<String> PROMETHEUS_NODES_FILTER =
-            Setting.simpleString("prometheus.nodes.filter", "_local",
+            Setting.simpleString(PROMETHEUS_NODES_FILTER_KEY, "_local",
                     Setting.Property.Dynamic, Setting.Property.NodeScope);
 
     private volatile boolean clusterSettings;
     private volatile boolean indices;
     private volatile String nodesFilter;
 
+    /**
+     * A constructor.
+     * @param settings Settings
+     * @param clusterSettings Cluster settings
+     */
     public PrometheusSettings(Settings settings, ClusterSettings clusterSettings) {
         setPrometheusClusterSettings(PROMETHEUS_CLUSTER_SETTINGS.get(settings));
         setPrometheusIndices(PROMETHEUS_INDICES.get(settings));
@@ -64,13 +87,25 @@ public class PrometheusSettings {
 
     private void setPrometheusNodesFilter(String filter) { this.nodesFilter = filter; }
 
+    /**
+     * Get value of settings key {@link #PROMETHEUS_CLUSTER_SETTINGS_KEY}.
+     * @return boolean value of the key
+     */
     public boolean getPrometheusClusterSettings() {
         return this.clusterSettings;
     }
 
+    /**
+     * Get value of settings key {@link #PROMETHEUS_INDICES_KEY}.
+     * @return boolean value of the key
+     */
     public boolean getPrometheusIndices() {
         return this.indices;
     }
 
+    /**
+     * Get value of settings key {@link #PROMETHEUS_NODES_FILTER_KEY}.
+     * @return boolean value of the key
+     */
     public String getNodesFilter() { return this.nodesFilter; }
 }

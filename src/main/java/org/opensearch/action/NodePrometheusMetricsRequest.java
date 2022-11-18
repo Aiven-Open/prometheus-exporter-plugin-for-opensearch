@@ -27,14 +27,27 @@ import java.io.IOException;
  */
 public class NodePrometheusMetricsRequest extends ClusterManagerNodeReadRequest<NodePrometheusMetricsRequest> {
 
+    /**
+     * A constructor.
+     */
     public NodePrometheusMetricsRequest() {
         super();
     }
 
+    /**
+     * A constructor that utilizes the inputStream.
+     * @param in inputStream
+     * @throws IOException if there is an exception reading from inputStream
+     */
     public NodePrometheusMetricsRequest(StreamInput in) throws IOException {
         super(in);
     }
 
+    /**
+     * A validation of the request.
+     * Currently, no validations are needed, thus this method always returns null.
+     * @return null
+     */
     @Override
     public ActionRequestValidationException validate() {
         return null;

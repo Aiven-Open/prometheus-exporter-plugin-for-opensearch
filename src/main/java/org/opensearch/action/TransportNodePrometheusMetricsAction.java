@@ -58,6 +58,14 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
     private final PrometheusSettings prometheusSettings;
     private final Logger logger = LogManager.getLogger(getClass());
 
+    /**
+     * A constructor.
+     * @param settings Settings
+     * @param client Cluster client
+     * @param transportService Transport service
+     * @param actionFilters Action filters
+     * @param clusterSettings Cluster settings
+     */
     @Inject
     public TransportNodePrometheusMetricsAction(Settings settings, Client client,
                                                 TransportService transportService, ActionFilters actionFilters,

@@ -9,7 +9,9 @@ package org.opensearch.plugin.prometheus;
 
 import org.opensearch.plugins.Plugin;
 
-
+/**
+ * TODO[lukas-vlcek]: Remove this class. It is not needed, it is a relict from OpenSearch Plugin template.
+ */
 public class RenamePlugin extends Plugin {
     // Implement the relevant Plugin Interfaces here
 }
