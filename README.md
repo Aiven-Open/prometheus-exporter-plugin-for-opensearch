@@ -38,22 +38,23 @@ This plugin was started as a fork of [Prometheus exporter for Elasticsearch®](h
 
 ## Compatibility Matrix
 
-| OpenSearch |      Plugin |   Release date |
-|-----------:|------------:|---------------:|
-|      2.3.0 |     2.3.0.0 |   Sep 19, 2022 |
-|      2.2.1 |     2.2.1.0 |   Sep  5, 2022 |
-|      2.2.0 |     2.2.0.0 |   Aug 13, 2022 |
-|      2.1.0 |     2.1.0.0 |  July 13, 2022 |
-|      2.0.1 |     2.0.1.0 |  July 12, 2022 |
-|      2.0.0 |     2.0.0.0 |   May 27, 2022 |
-|  2.0.0-rc1 | 2.0.0.0-rc1 |   May 19, 2022 |
-|      1.3.5 |     1.3.5.0 |   Sep  5, 2022 |
-|      1.3.4 |     1.3.4.0 |   Jul 15, 2022 |
-|      1.3.3 |     1.3.3.0 |   Jun 15, 2022 |
-|      1.3.2 |     1.3.2.0 |   May 10, 2022 |
-|      1.3.1 |     1.3.1.0 |   Apr 08, 2022 |
-|      1.3.0 |     1.3.0.0 |   Mar 22, 2022 |
-|   <= 1.2.4 |         (*) |            (*) |
+| OpenSearch |      Plugin |  Release date |
+|-----------:|------------:|--------------:|
+|      2.3.0 |     2.3.0.0 |  Sep 19, 2022 |
+|      2.2.1 |     2.2.1.0 |  Sep  5, 2022 |
+|      2.2.0 |     2.2.0.0 |  Aug 13, 2022 |
+|      2.1.0 |     2.1.0.0 | July 13, 2022 |
+|      2.0.1 |     2.0.1.0 | July 12, 2022 |
+|      2.0.0 |     2.0.0.0 |  May 27, 2022 |
+|  2.0.0-rc1 | 2.0.0.0-rc1 |  May 19, 2022 |
+|      1.3.6 |     1.3.6.0 |  Oct 10, 2022 |
+|      1.3.5 |     1.3.5.0 |  Sep  5, 2022 |
+|      1.3.4 |     1.3.4.0 |  Jul 15, 2022 |
+|      1.3.3 |     1.3.3.0 |  Jun 15, 2022 |
+|      1.3.2 |     1.3.2.0 |  May 10, 2022 |
+|      1.3.1 |     1.3.1.0 |  Apr 08, 2022 |
+|      1.3.0 |     1.3.0.0 |  Mar 22, 2022 |
+|   <= 1.2.4 |         (*) |           (*) |
 
 _(*) If you are looking for plugin releases supporting earlier (`<= 1.2.4`) OpenSearch versions please visit
 <https://github.com/aparo/opensearch-prometheus-exporter/releases>._
