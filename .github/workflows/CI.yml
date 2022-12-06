@@ -22,6 +22,10 @@ jobs:
       run: |
         brew install jsonnet jsonnet-bundler prometheus
 
+    - name: Run jsonnet-bundler
+      run: |
+        jb install
+
     - name: Run Make
       run: |
         ./make clean & make

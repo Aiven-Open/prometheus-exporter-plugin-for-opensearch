@@ -1,6 +1,8 @@
 DISTRIBUTION_FOLDER = distribution
 JSONNET_FMT := jsonnetfmt -n 2 --max-blank-lines 2 --string-style s --comment-style s
 
+.PHONY: clean dashboards
+
 all: fmt dashboards prometheus_alerts.yaml prometheus_recording_rules.yaml lint
 
 fmt:
