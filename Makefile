@@ -1,7 +1,7 @@
 DISTRIBUTION_FOLDER = distribution
 JSONNET_FMT := jsonnetfmt -n 2 --max-blank-lines 2 --string-style s --comment-style s
 
-.PHONY: clean dashboards
+.PHONY: clean dashboards refresh-jb
 
 all: fmt dashboards prometheus_alerts.yaml prometheus_recording_rules.yaml lint
 
@@ -32,3 +32,11 @@ lint: prometheus_alerts.yaml prometheus_recording_rules.yaml
 
 clean:
 	rm -rf ${DISTRIBUTION_FOLDER}
+
+# Refresh all jb dependencies.
+# Keep all jsonnet dependencies up to date otherwise it can get out-of-sync with CI (CI always uses fresh deps).
+# A good practice is to run refresh before starting work on a new PR.
+refresh-jb:
+	rm -rf vendor
+	rm jsonnetfile.lock.json
+	jb install
