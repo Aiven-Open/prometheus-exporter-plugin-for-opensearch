@@ -1,6 +1,6 @@
 # Mixin-1.0.0-rc1
 
-Release date: TBD
+Release date: 2022-12-06
 
 ## New Features:
 
