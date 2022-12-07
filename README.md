@@ -2,6 +2,7 @@
 
 The [Prometheus® exporter](https://prometheus.io/docs/instrumenting/writing_exporters/) plugin for OpenSearch® exposes many OpenSearch metrics in [Prometheus format](https://prometheus.io/docs/instrumenting/exposition_formats/).
 
+- [Preface](#preface)
 - [Introduction](#introduction)
 - [Compatibility Matrix](#compatibility-matrix)
 - [Install or Remove Plugin](#install-or-remove-plugin)
@@ -15,6 +16,13 @@ The [Prometheus® exporter](https://prometheus.io/docs/instrumenting/writing_exp
 - [Trademarks & Attributions](#trademarks--attributions)
 
 ---
+
+## Preface
+
+This repository contains two projects that are related, but each can be used independently:
+
+1. The first project is a Java plugin – Prometheus Exporter Plugin for OpenSearch® – this code lives in the `main` branch.
+2. The second project is a Jsonnet bundle – OpenSearch® Mixin – this code lives in the `mixin` branch.
 
 ## Introduction
 
