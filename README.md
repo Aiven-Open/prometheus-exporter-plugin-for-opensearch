@@ -1,6 +1,6 @@
 # Mixin for OpenSearch
 
-This repository branch contains a "Mixin" for OpenSearch® which is a set of Grafana® Dashbaord(s) and Prometheus® Rules and Alerts.
+This repository branch contains a "Mixin" for OpenSearch® which is a set of Grafana® Dashboard(s) and Prometheus® Rules and Alerts.
 
 - [Introduction](#introduction)
 - [Compatibility with the Prometheus Exporter Plugin](#compatibility-with-the-prometheus-exporter-plugin)
