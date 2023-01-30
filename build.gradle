@@ -76,7 +76,7 @@ buildscript {
 
         versions = [
                 "opensearch": opensearch_version,
-                "prometheus": "0.15.0"
+                "prometheus": "0.16.0"
         ]
     }
 
@@ -107,8 +107,8 @@ dependencies {
 // See https://docs.gradle.org/6.8.1/userguide/java_plugin.html#sec:java_plugin_and_dependency_management
 //    compile "io.prometheus:simpleclient:${versions.prometheus}"
 //    compile "io.prometheus:simpleclient_common:${versions.prometheus}"
-    implementation group: 'io.prometheus', name: 'simpleclient', version: '0.15.0'
-    implementation group: 'io.prometheus', name: 'simpleclient_common', version: '0.15.0'
+    implementation group: 'io.prometheus', name: 'simpleclient', version: '0.16.0'
+    implementation group: 'io.prometheus', name: 'simpleclient_common', version: '0.16.0'
 }
 
 test {
