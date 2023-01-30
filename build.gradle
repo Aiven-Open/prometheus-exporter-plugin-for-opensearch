@@ -14,16 +14,6 @@ def pluginDescription = pluginDescription
 //def pathToPlugin = 'path.to.plugin'
 def pluginClassName = pluginClassname
 
-//tasks.register("preparePluginPathDirs") {
-//    mustRunAfter clean
-//    doLast {
-//        def newPath = pathToPlugin.replace(".", "/")
-//        mkdir "src/main/java/org/opensearch/$newPath"
-//        mkdir "src/test/java/org/opensearch/$newPath"
-//        mkdir "src/yamlRestTest/java/org/opensearch/$newPath"
-//    }
-//}
-
 opensearchplugin {
     name pluginName
     description pluginDescription
