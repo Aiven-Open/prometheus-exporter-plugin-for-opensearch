@@ -101,6 +101,12 @@ dependencies {
     implementation group: 'io.prometheus', name: 'simpleclient_common', version: '0.16.0'
 }
 
+restResources {
+    restApi {
+        includeCore '_common', 'cat', 'cluster', 'nodes', 'indices', 'index'
+    }
+}
+
 test {
     include '**/*Tests.class'
 }
