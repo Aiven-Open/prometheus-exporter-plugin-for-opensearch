@@ -16,7 +16,5 @@
  */
 
 grant {
-    permission java.lang.RuntimePermission "accessClassInPackage.sun.misc";
-    permission java.lang.RuntimePermission "accessDeclaredMembers";
-    permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+    // No privileged operations are required, see #131
 };
