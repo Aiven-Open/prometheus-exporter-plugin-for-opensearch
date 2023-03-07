@@ -106,7 +106,7 @@ dependencies {
 //    compile "io.prometheus:simpleclient:${versions.prometheus}"
 //    compile "io.prometheus:simpleclient_common:${versions.prometheus}"
     implementation group: 'io.prometheus', name: 'simpleclient', version: '0.15.0'
-    implementation group: 'io.prometheus', name: 'simpleclient_common', version: '0.15.0'
+    implementation group: 'io.prometheus', name: 'simpleclient_common', version: '0.16.0'
 }
 
 test {
