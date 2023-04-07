@@ -37,6 +37,7 @@ import org.opensearch.action.support.HandledTransportAction;
 import org.opensearch.client.Client;
 import org.opensearch.client.Requests;
 import org.opensearch.common.Nullable;
+import org.opensearch.common.Strings;
 import org.opensearch.common.inject.Inject;
 import org.opensearch.common.settings.ClusterSettings;
 import org.opensearch.common.settings.Settings;
@@ -132,7 +133,7 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
 
             // Indices stats request is not "node-specific", it does not support any "_local" notion
             // it is broad-casted to all cluster nodes.
-            this.indicesStatsRequest = isPrometheusIndices ? new IndicesStatsRequest() : null;
+            this.indicesStatsRequest = isPrometheusIndices ? (new IndicesStatsRequest()).indices(Strings.splitStringByCommaToArray(prometheusSettings.getPrometheusIndicesFilter())) : null;
 
             // Cluster settings are get via ClusterStateRequest (see elasticsearch RestClusterGetSettingsAction for details)
             // We prefer to send it to master node (hence local=false; it should be set by default but we want to be sure).

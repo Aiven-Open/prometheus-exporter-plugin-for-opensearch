@@ -34,6 +34,7 @@ public class PrometheusSettings {
     static String PROMETHEUS_CLUSTER_SETTINGS_KEY = "prometheus.cluster.settings";
     static String PROMETHEUS_INDICES_KEY = "prometheus.indices";
     static String PROMETHEUS_NODES_FILTER_KEY = "prometheus.nodes.filter";
+    static String PROMETHEUS_INDICES_FILTER_KEY = "prometheus.indices_filter";
 
     /**
      * This setting is used configure weather to expose cluster settings metrics or not. The default value is true.
@@ -59,9 +60,18 @@ public class PrometheusSettings {
             Setting.simpleString(PROMETHEUS_NODES_FILTER_KEY, "_local",
                     Setting.Property.Dynamic, Setting.Property.NodeScope);
 
+    /**
+     * This setting is used configure to filter indices statistics with indices starting with prefixes. The default value is "".
+     * Can be configured in opensearch.yml file or update dynamically under key {@link #PROMETHEUS_INDICES_FILTER_KEY}.
+     */
+    public static final Setting<String> PROMETHEUS_INDICES_FILTER =
+            Setting.simpleString(PROMETHEUS_INDICES_FILTER_KEY, "",
+                    Setting.Property.Dynamic, Setting.Property.NodeScope);
+
     private volatile boolean clusterSettings;
     private volatile boolean indices;
     private volatile String nodesFilter;
+    private volatile String indicesFilter;
 
     /**
      * A constructor.
@@ -72,9 +82,11 @@ public class PrometheusSettings {
         setPrometheusClusterSettings(PROMETHEUS_CLUSTER_SETTINGS.get(settings));
         setPrometheusIndices(PROMETHEUS_INDICES.get(settings));
         setPrometheusNodesFilter(PROMETHEUS_NODES_FILTER.get(settings));
+        setPrometheusIndicesFilter(PROMETHEUS_INDICES_FILTER.get(settings));
         clusterSettings.addSettingsUpdateConsumer(PROMETHEUS_CLUSTER_SETTINGS, this::setPrometheusClusterSettings);
         clusterSettings.addSettingsUpdateConsumer(PROMETHEUS_INDICES, this::setPrometheusIndices);
         clusterSettings.addSettingsUpdateConsumer(PROMETHEUS_NODES_FILTER, this::setPrometheusNodesFilter);
+        clusterSettings.addSettingsUpdateConsumer(PROMETHEUS_INDICES_FILTER, this::setPrometheusIndicesFilter);
     }
 
     private void setPrometheusClusterSettings(boolean flag) {
@@ -86,6 +98,10 @@ public class PrometheusSettings {
     }
 
     private void setPrometheusNodesFilter(String filter) { this.nodesFilter = filter; }
+
+    private void setPrometheusIndicesFilter(String indicesFilter) {
+        this.indicesFilter = indicesFilter;
+    }
 
     /**
      * Get value of settings key {@link #PROMETHEUS_CLUSTER_SETTINGS_KEY}.
@@ -108,4 +124,12 @@ public class PrometheusSettings {
      * @return boolean value of the key
      */
     public String getNodesFilter() { return this.nodesFilter; }
+
+    /**
+     * Get value of settings key {@link #PROMETHEUS_INDICES_FILTER_KEY}.
+     * @return string value of the key
+     */
+    public String getPrometheusIndicesFilter() {
+        return this.indicesFilter;
+    }
 }

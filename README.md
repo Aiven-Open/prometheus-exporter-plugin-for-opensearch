@@ -139,6 +139,16 @@ For example to get stats for all cluster nodes from any node use settings:
 prometheus.nodes.filter: "_all"
 ```
 
+#### Indices filter
+
+Prometheus exporter can be configured to filter indices statistics with indices starting with prefixes.
+Default value: `""`.
+
+For example to filter indices statistics with indices starting with prefixes such as logs, alarms:
+```
+prometheus.indices_filter: "logs-*,alarms*"
+```
+
 ## Usage
 
 Metrics are directly available at:
