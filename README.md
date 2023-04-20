@@ -141,12 +141,13 @@ prometheus.nodes.filter: "_all"
 
 #### Indices filter
 
-Prometheus exporter can be configured to filter indices statistics with indices starting with prefixes.
+Prometheus exporter can be configured to filter indices statistics from selected indices.
+To target all indices, use '' or * or _all
 Default value: `""`.
 
-For example to filter indices statistics with indices starting with prefixes such as logs, alarms:
+For example to filter indices statistics:
 ```
-prometheus.indices_filter: "logs-*,alarms*"
+prometheus.indices_filter: "log-*,*log,*log*,log*-test"
 ```
 
 ## Usage
