@@ -3,39 +3,8 @@ import org.opensearch.gradle.test.RestIntegTestTask
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'opensearch.opensearchplugin'
-apply plugin: 'opensearch.yaml-rest-test'
-
-def pluginName = pluginName
-def pluginDescription = pluginDescription
-//def projectPath = 'org.opensearch'
-//def pathToPlugin = 'path.to.plugin'
-def pluginClassName = pluginClassname
-
-opensearchplugin {
-    name pluginName
-    description pluginDescription
-//    classname "${projectPath}.${pathToPlugin}.${pluginClassName}"
-    classname pluginClassName
-    licenseFile rootProject.file('LICENSE.txt')
-    noticeFile rootProject.file('NOTICE.txt')
-}
-
-// thirdparty audit needs can be enabled
-thirdPartyAudit.enabled = false
-
-// This requires an additional Jar not published as part of build-tools
-loggerUsageCheck.enabled = false
-
-// No need to validate pom, as we do not upload to maven/sonatype
-validateNebulaPom.enabled = false
-
 buildscript {
-
     ext {
-
         // Four {digit(s)} concatenated with a "." followed by -rc{digit(s)}
         // Examples: 1.0.0.1-rc2, 2.10.4.0-rc5
         // Group (3) refers to the last .{digit{(s)} pattern (this is what we want to remove for OpS version)
@@ -48,7 +17,6 @@ buildscript {
 
         String opensearch_version
         String plugin_version = version
-
 
         Matcher rc_matcher = RC_pattern.matcher(plugin_version)
         Matcher other_matcher = OTHER_pattern.matcher(plugin_version)
@@ -82,6 +50,36 @@ buildscript {
         classpath   "org.opensearch.gradle:build-tools:${versions.opensearch}"
     }
 }
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'opensearch.opensearchplugin'
+apply plugin: 'opensearch.yaml-rest-test'
+//apply plugin: 'checkstyle'
+
+def pluginName = pluginName
+def pluginDescription = pluginDescription
+//def projectPath = 'org.opensearch'
+//def pathToPlugin = 'path.to.plugin'
+def pluginClassName = pluginClassname
+
+opensearchplugin {
+    name pluginName
+    description pluginDescription
+//    classname "${projectPath}.${pathToPlugin}.${pluginClassName}"
+    classname pluginClassName
+    licenseFile rootProject.file('LICENSE.txt')
+    noticeFile rootProject.file('NOTICE.txt')
+}
+
+// thirdparty audit needs can be enabled
+thirdPartyAudit.enabled = false
+
+// This requires an additional Jar not published as part of build-tools
+loggerUsageCheck.enabled = false
+
+// No need to validate pom, as we do not upload to maven/sonatype
+validateNebulaPom.enabled = false
 
 repositories {
     mavenLocal()

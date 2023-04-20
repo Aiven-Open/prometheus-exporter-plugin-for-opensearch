@@ -17,7 +17,6 @@
   - match: {defaults.prometheus.cluster.settings: "true"}
   - match: {defaults.prometheus.indices: "true"}
   - match: {defaults.prometheus.nodes.filter: "_local"}
-  - match: {defaults.prometheus.indices_filter: ""}
   - match: {defaults.prometheus.metric_name.prefix: "opensearch_"}
 
 
@@ -45,16 +44,6 @@
 
   - match: {persistent: {prometheus.nodes.filter: "_all"}}
 
-  # Change indices filter to "logs*"
-  - do:
-      cluster.put_settings:
-        body:
-          persistent:
-            prometheus.indices_filter: "logs*"
-        flat_settings: true
-
-  - match: {persistent: {prometheus.indices_filter: "logs*"}}
-
   # Verify in Prometheus metrics:
   - do:
       prometheus.metrics: {}
@@ -74,28 +63,4 @@
         body:
           persistent:
             prometheus.nodes.filter: null
-        flat_settings: true
-
-  # Remove persistent settings
-  - do:
-      cluster.put_settings:
-        body:
-          persistent:
-            prometheus.indices_filter: null
-        flat_settings: true
-
-  # Remove persistent settings
-  - do:
-      cluster.put_settings:
-        body:
-          persistent:
-            prometheus.indices_filter: null
-        flat_settings: true
-
-  # Remove persistent settings
-  - do:
-      cluster.put_settings:
-        body:
-          persistent:
-            prometheus.indices_filter: null
         flat_settings: true

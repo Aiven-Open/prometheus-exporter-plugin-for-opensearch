@@ -1,0 +1,157 @@
+---
+"Indices filter":
+
+  # Make sure indices filter setting is in the default state
+  - do:
+      cluster.get_settings:
+        include_defaults: false
+
+  - match: {persistent: {}}
+  - match: {transient: {}}
+
+  - do:
+      cluster.get_settings:
+        include_defaults: true
+        filter_path: defaults.prometheus
+
+  - match: {defaults.prometheus.indices_filter: ""}
+
+   # Create 3 indices
+  - do:
+      index:
+        index:  log-a-test
+        id:     1
+        body:   { foo: bar }
+
+  - do:
+      index:
+        index:  log-b-test
+        id:     1
+        body:   { foo: bar }
+
+  - do:
+      index:
+        index:  log-c-test
+        id:     1
+        body:   { foo: bar }
+
+  # Should have metrics for all indices
+  - do:
+      prometheus.metrics: {}
+
+  - match:
+      $body: |
+        /.*
+        (opensearch_index_status\{
+            cluster="yamlRestTest",
+            index="(log-a-test|log-b-test|log-c-test)",
+        \} \s+ \d+\.\d+ \n?){3}
+        .*/
+
+  # Change indices filter to "log-a-*"
+  - do:
+      cluster.put_settings:
+        body:
+          persistent:
+            prometheus.indices_filter: "log-a-*"
+        flat_settings: true
+
+  - match: {persistent: {prometheus.indices_filter: "log-a-*"}}
+
+  # Should have metrics for index log-a-test only, no metrics for others
+  - do:
+      prometheus.metrics: {}
+
+  - match:
+      $body: |
+        /.*
+        opensearch_index_status\{
+            cluster="yamlRestTest",
+            index="(?=log-a-test)(?!(log-b-test|log-c-test))(.*)",
+        \} \s+ \d+\.\d+ \n?
+        .*/
+
+  # Change indices filter to "*b-*,log*c-test"
+  - do:
+      cluster.put_settings:
+        body:
+          persistent:
+            prometheus.indices_filter: "*b-*,log*c-test"
+        flat_settings: true
+
+  - match: {persistent: {prometheus.indices_filter: "*b-*,log*c-test"}}
+
+  # Should have metrics for indices log-b-test and log-c-test, no metrics for index log-a-test
+  - do:
+      prometheus.metrics: {}
+
+  - match:
+      $body: |
+        /.*
+        (opensearch_index_status\{
+            cluster="yamlRestTest",
+            index="(?=(log-b-test|log-c-test))(?!log-a-test)(.*)",
+        \} \s+ \d+\.\d+ \n?){2}
+        .*/
+
+  # Change indices filter to "*"
+  - do:
+      cluster.put_settings:
+        body:
+          persistent:
+            prometheus.indices_filter: "*"
+        flat_settings: true
+
+  - match: {persistent: {prometheus.indices_filter: "*"}}
+
+  # Should have metrics for all indices
+  - do:
+      prometheus.metrics: {}
+
+  - match:
+      $body: |
+        /.*
+        (opensearch_index_status\{
+            cluster="yamlRestTest",
+            index="(log-a-test|log-b-test|log-c-test)",
+        \} \s+ \d+\.\d+ \n?){3}
+        .*/
+
+  # Change indices filter to "_all"
+  - do:
+      cluster.put_settings:
+        body:
+          persistent:
+            prometheus.indices_filter: "_all"
+        flat_settings: true
+
+  - match: {persistent: {prometheus.indices_filter: "_all"}}
+
+  # Should have metrics for all indices
+  - do:
+      prometheus.metrics: {}
+
+  - match:
+      $body: |
+        /.*
+        (opensearch_index_status\{
+            cluster="yamlRestTest",
+            index="(log-a-test|log-b-test|log-c-test)",
+        \} \s+ \d+\.\d+ \n?){3}
+        .*/
+
+
+  # Unexpected input values
+  - do:
+      catch: request
+      cluster.put_settings:
+        body:
+          persistent:
+            prometheus.indices_filter: [ "", null, 10 ]
+        flat_settings: true
+
+  - match: {status: 500}
+  - match: {error.type: "settings_exception"}
+  - match: {error.reason: "Failed to load settings from [{\"prometheus.indices_filter\":[\"\",null,10]}]"}
+  - match: {error.caused_by.type: "illegal_state_exception"}
+  - match: {error.caused_by.reason: "only value lists are allowed in serialized settings"}
