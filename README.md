@@ -142,12 +142,20 @@ prometheus.nodes.filter: "_all"
 #### Indices filter
 
 Prometheus exporter can be configured to filter indices statistics from selected indices.
-To target all indices, use '' or * or _all
+To target all indices, use "" or * or _all or null.
 Default value: `""`.
 
 For example to filter indices statistics:
 ```
-prometheus.indices_filter: "log-*,*log,*log*,log*-test"
+prometheus.indices_filter.selected_indices: "log-*,*log,*log*,log*-test"
+```
+
+Users can select which option for filtering indices statistics
+Default value: `"STRICT_EXPAND_OPEN_FORBID_CLOSED"`.
+
+For example to select an option:
+```
+prometheus.indices_filter.selected_option: "LENIENT_EXPAND_OPEN"
 ```
 
 ## Usage
