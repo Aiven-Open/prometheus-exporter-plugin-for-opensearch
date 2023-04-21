@@ -76,7 +76,9 @@ public class PrometheusExporterPlugin extends Plugin implements ActionPlugin {
                 PrometheusSettings.PROMETHEUS_CLUSTER_SETTINGS,
                 PrometheusSettings.PROMETHEUS_INDICES,
                 PrometheusSettings.PROMETHEUS_NODES_FILTER,
-                PrometheusSettings.PROMETHEUS_INDICES_FILTER,
+                PrometheusSettings.PROMETHEUS_SELECTED_INDICES,
+                PrometheusSettings.PROMETHEUS_SELECTED_OPTION,
+                PrometheusSettings.PROMETHEUS_OPTIONS_DESCRIPTION,
                 RestPrometheusMetricsAction.METRIC_PREFIX
         );
         return Collections.unmodifiableList(settings);
