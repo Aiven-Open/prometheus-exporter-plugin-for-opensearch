@@ -150,12 +150,27 @@ For example to filter indices statistics:
 prometheus.indices_filter.selected_indices: "log-*,*log,*log*,log*-test"
 ```
 
-Users can select which option for filtering indices statistics
+Users can select which option for filtering indices statistics.
 Default value: `"STRICT_EXPAND_OPEN_FORBID_CLOSED"`.
 
 For example to select an option:
 ```
 prometheus.indices_filter.selected_option: "LENIENT_EXPAND_OPEN"
+```
+Here is a list of indices options available for selection
+```
+STRICT_EXPAND_OPEN: indices options that requires every specified index to exist, expands wildcards only to open indices and allows that no indices are resolved from wildcard expressions (not returning an error).
+STRICT_EXPAND_OPEN_HIDDEN: indices options that requires every specified index to exist, expands wildcards only to open indices, includes hidden indices, and allows that no indices are resolved from wildcard expressions (not returning an error).
+STRICT_EXPAND_OPEN_FORBID_CLOSED: indices options that requires every specified index to exist, expands wildcards only to open indices, allows that no indices are resolved from wildcard expressions (not returning an error) and forbids the use of closed indices by throwing an error.
+STRICT_EXPAND_OPEN_HIDDEN_FORBID_CLOSED: indices options that requires every specified index to exist, expands wildcards only to open indices, includes hidden indices, and allows that no indices are resolved from wildcard expressions (not returning an error) and forbids the use of closed indices by throwing an error.
+STRICT_EXPAND_OPEN_FORBID_CLOSED_IGNORE_THROTTLED: indices options that requires every specified index to exist, expands wildcards only to open indices, allows that no indices are resolved from wildcard expressions (not returning an error), forbids the use of closed indices by throwing an error and ignores indices that are throttled.
+STRICT_EXPAND_OPEN_CLOSED: indices option that requires every specified index to exist, expands wildcards to both open and closed indices and allows that no indices are resolved from wildcard expressions (not returning an error).
+STRICT_EXPAND_OPEN_CLOSED_HIDDEN: indices option that requires every specified index to exist, expands wildcards to both open and closed indices, includes hidden indices, and allows that no indices are resolved from wildcard expressions (not returning an error).
+STRICT_SINGLE_INDEX_NO_EXPAND_FORBID_CLOSED: indices option that requires each specified index or alias to exist, doesn't expand wildcards and throws error if any of the aliases resolves to multiple indices.
+LENIENT_EXPAND_OPEN: indices options that ignores unavailable indices, expands wildcards only to open indices and allows that no indices are resolved from wildcard expressions (not returning an error).
+LENIENT_EXPAND_OPEN_HIDDEN: indices options that ignores unavailable indices, expands wildcards to open and hidden indices, and allows that no indices are resolved from wildcard expressions (not returning an error).
+LENIENT_EXPAND_OPEN_CLOSED: indices options that ignores unavailable indices, expands wildcards to both open and closed indices and allows that no indices are resolved from wildcard expressions (not returning an error).
+LENIENT_EXPAND_OPEN_CLOSED_HIDDEN: indices options that ignores unavailable indices, expands wildcards to all open and closed indices and allows that no indices are resolved from wildcard expressions (not returning an error).
 ```
 
 ## Usage

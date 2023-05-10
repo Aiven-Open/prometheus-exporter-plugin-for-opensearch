@@ -23,10 +23,6 @@ import org.opensearch.common.settings.ClusterSettings;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
 /**
  * Dynamically updatable Prometheus exporter settings.
  *
@@ -40,6 +36,7 @@ public class PrometheusSettings {
         STRICT_EXPAND_OPEN,
         STRICT_EXPAND_OPEN_HIDDEN,
         STRICT_EXPAND_OPEN_FORBID_CLOSED,
+        STRICT_EXPAND_OPEN_HIDDEN_FORBID_CLOSED,
         STRICT_EXPAND_OPEN_FORBID_CLOSED_IGNORE_THROTTLED,
         STRICT_EXPAND_OPEN_CLOSED,
         STRICT_EXPAND_OPEN_CLOSED_HIDDEN,
@@ -55,7 +52,6 @@ public class PrometheusSettings {
     static String PROMETHEUS_NODES_FILTER_KEY = "prometheus.nodes.filter";
     static String PROMETHEUS_SELECTED_INDICES_KEY = "prometheus.indices_filter.selected_indices";
     static String PROMETHEUS_SELECTED_OPTION_KEY = "prometheus.indices_filter.selected_option";
-    static String PROMETHEUS_OPTIONS_DESCRIPTION_KEY = "prometheus.indices_filter.options_description";
 
     /**
      * This setting is used configure weather to expose cluster settings metrics or not. The default value is true.
@@ -99,32 +95,11 @@ public class PrometheusSettings {
                     String.valueOf(INDEX_FILTER_OPTIONS.STRICT_EXPAND_OPEN_FORBID_CLOSED),
                     INDEX_FILTER_OPTIONS::valueOf, Setting.Property.Dynamic, Setting.Property.NodeScope);
 
-    /**
-     * This setting is used to display options description
-     */
-    public static final Setting<List<String>> PROMETHEUS_OPTIONS_DESCRIPTION =
-            Setting.listSetting(PROMETHEUS_OPTIONS_DESCRIPTION_KEY,
-                    Arrays.asList(
-                            "STRICT_EXPAND_OPEN: indices options that requires every specified index to exist, expands wildcards only to open indices and allows that no indices are resolved from wildcard expressions (not returning an error).",
-                            "STRICT_EXPAND_OPEN_HIDDEN: indices options that requires every specified index to exist, expands wildcards only to open indices, includes hidden indices, and allows that no indices are resolved from wildcard expressions (not returning an error).",
-                            "STRICT_EXPAND_OPEN_FORBID_CLOSED: indices options that requires every specified index to exist, expands wildcards only to open indices, allows that no indices are resolved from wildcard expressions (not returning an error) and forbids the use of closed indices by throwing an error.",
-                            "STRICT_EXPAND_OPEN_FORBID_CLOSED_IGNORE_THROTTLED: indices options that requires every specified index to exist, expands wildcards only to open indices, allows that no indices are resolved from wildcard expressions (not returning an error), forbids the use of closed indices by throwing an error and ignores indices that are throttled.",
-                            "STRICT_EXPAND_OPEN_CLOSED: indices option that requires every specified index to exist, expands wildcards to both open and closed indices and allows that no indices are resolved from wildcard expressions (not returning an error).",
-                            "STRICT_EXPAND_OPEN_CLOSED_HIDDEN: indices option that requires every specified index to exist, expands wildcards to both open and closed indices, includes hidden indices, and allows that no indices are resolved from wildcard expressions (not returning an error).",
-                            "STRICT_SINGLE_INDEX_NO_EXPAND_FORBID_CLOSED: indices option that requires each specified index or alias to exist, doesn't expand wildcards and throws error if any of the aliases resolves to multiple indices.",
-                            "LENIENT_EXPAND_OPEN: indices options that ignores unavailable indices, expands wildcards only to open indices and allows that no indices are resolved from wildcard expressions (not returning an error).",
-                            "LENIENT_EXPAND_OPEN_HIDDEN: indices options that ignores unavailable indices, expands wildcards to open and hidden indices, and allows that no indices are resolved from wildcard expressions (not returning an error).",
-                            "LENIENT_EXPAND_OPEN_CLOSED: indices options that ignores unavailable indices, expands wildcards to both open and closed indices and allows that no indices are resolved from wildcard expressions (not returning an error).",
-                            "LENIENT_EXPAND_OPEN_CLOSED_HIDDEN: indices options that ignores unavailable indices, expands wildcards to all open and closed indices and allows that no indices are resolved from wildcard expressions (not returning an error)."
-                    ),
-                    Function.identity(), Setting.Property.NodeScope);
-
     private volatile boolean clusterSettings;
     private volatile boolean indices;
     private volatile String nodesFilter;
     private volatile String selectedIndices;
     private volatile INDEX_FILTER_OPTIONS selectedOption;
-    private volatile List<String> optionsDescription;
 
     /**
      * A constructor.
@@ -137,7 +112,6 @@ public class PrometheusSettings {
         setPrometheusNodesFilter(PROMETHEUS_NODES_FILTER.get(settings));
         setPrometheusSelectedIndices(PROMETHEUS_SELECTED_INDICES.get(settings));
         setPrometheusSelectedOption(PROMETHEUS_SELECTED_OPTION.get(settings));
-        setPrometheusOptionsDescription(PROMETHEUS_OPTIONS_DESCRIPTION.get(settings));
         clusterSettings.addSettingsUpdateConsumer(PROMETHEUS_CLUSTER_SETTINGS, this::setPrometheusClusterSettings);
         clusterSettings.addSettingsUpdateConsumer(PROMETHEUS_INDICES, this::setPrometheusIndices);
         clusterSettings.addSettingsUpdateConsumer(PROMETHEUS_NODES_FILTER, this::setPrometheusNodesFilter);
@@ -161,10 +135,6 @@ public class PrometheusSettings {
 
     private void setPrometheusSelectedOption(INDEX_FILTER_OPTIONS selectedOption) {
         this.selectedOption = selectedOption;
-    }
-
-    private void setPrometheusOptionsDescription(List<String> optionsDescription) {
-        this.optionsDescription = optionsDescription;
     }
 
     /**
@@ -212,6 +182,9 @@ public class PrometheusSettings {
                 break;
             case STRICT_EXPAND_OPEN_FORBID_CLOSED:
                 indicesOptions = IndicesOptions.strictExpandOpenAndForbidClosed();
+                break;
+            case STRICT_EXPAND_OPEN_HIDDEN_FORBID_CLOSED:
+                indicesOptions = IndicesOptions.STRICT_EXPAND_OPEN_HIDDEN_FORBID_CLOSED;
                 break;
             case STRICT_EXPAND_OPEN_FORBID_CLOSED_IGNORE_THROTTLED:
                 indicesOptions = IndicesOptions.strictExpandOpenAndForbidClosedIgnoreThrottled();
