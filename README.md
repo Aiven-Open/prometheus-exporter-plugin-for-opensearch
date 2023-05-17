@@ -83,6 +83,10 @@ To **install** the plugin:
 
 `./bin/opensearch-plugin install https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/releases/download/2.7.0.0/prometheus-exporter-2.7.0.0.zip`
 
+To **offline install** the plugin:
+
+`./bin/opensearch-plugin install file:///your_path/prometheus-exporter-2.7.0.0.zip`
+
 To **remove** the plugin.
 
 `./bin/opensearch-plugin remove prometheus-exporter`
