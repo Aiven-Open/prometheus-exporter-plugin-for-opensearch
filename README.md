@@ -239,13 +239,15 @@ If you have doubts about the system requirements, please check the [CI.yml](.git
 
 ## Testing
 
-Project contains [integration tests](src/yamlRestTest/resources/rest-api-spec) implemented using
+Project contains:
+- [integration tests](src/yamlRestTest/resources/rest-api-spec) implemented using
 [rest layer](https://github.com/opensearch-project/OpenSearch/blob/main/TESTING.md#testing-the-rest-layer)
-framework.
+framework
+- [internal cluster tests](src/test)
 
 Complete test suite is run using:
 ```
-./gradlew clean assemble check
+./gradlew clean check
 ```
 
 To run individual integration rest test file use:
