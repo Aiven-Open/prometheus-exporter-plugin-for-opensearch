@@ -61,6 +61,7 @@ This plugin was started as a fork of [Prometheus exporter for Elasticsearch®](h
 |      2.0.1 |     2.0.1.0 | July 12, 2022 |
 |      2.0.0 |     2.0.0.0 |  May 27, 2022 |
 |  2.0.0-rc1 | 2.0.0.0-rc1 |  May 19, 2022 |
+|     1.3.11 |    1.3.11.0 |  Jul 06, 2023 |
 |     1.3.10 |    1.3.10.0 |  May 23, 2023 |
 |      1.3.9 |     1.3.9.0 |  Mar 20, 2023 |
 |      1.3.8 |     1.3.8.0 |  Mar 03, 2023 |
