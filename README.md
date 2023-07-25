@@ -45,6 +45,7 @@ This plugin was started as a fork of [Prometheus exporter for Elasticsearch®](h
 - Cluster settings (notably [disk watermarks](https://opensearch.org/docs/latest/opensearch/popular-api/#change-disk-watermarks-or-other-cluster-settings) that can be updated dynamically)
 
 ## Compatibility Matrix
+NOTE: OpenSearch plugins much match _exactly_ in major.minor.path version to the OpenSearch instance it's running in, e.g. plugins versions 2.8.0.x work only with OpenSearch 2.8.0, see also [Opensearch Plugins](https://opensearch.org/docs/latest/install-and-configure/plugins/#available-plugins). Therefore you must keep your [prometheus-exporter-plugin-for-opensearch version](https://github.com/aiven/prometheus-exporter-plugin-for-opensearch/releases) in sync with your OpenSearch version.
 
 | OpenSearch |      Plugin |  Release date |
 |-----------:|------------:|--------------:|
