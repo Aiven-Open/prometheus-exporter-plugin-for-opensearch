@@ -18,7 +18,7 @@
 package org.compuscene.metrics.prometheus;
 
 import org.opensearch.action.support.IndicesOptions;
-import org.opensearch.common.Strings;
+import org.opensearch.core.common.Strings;
 import org.opensearch.common.settings.ClusterSettings;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
