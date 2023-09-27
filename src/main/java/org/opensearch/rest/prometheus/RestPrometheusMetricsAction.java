@@ -32,6 +32,7 @@ import org.opensearch.common.network.NetworkAddress;
 import org.opensearch.common.settings.ClusterSettings;
 import org.opensearch.common.settings.Setting;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.core.rest.RestStatus;
 import org.opensearch.rest.*;
 import org.opensearch.rest.action.RestResponseListener;
 

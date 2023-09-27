@@ -23,7 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.compuscene.metrics.prometheus.PrometheusSettings;
 import org.opensearch.action.ActionRequest;
-import org.opensearch.action.ActionResponse;
+import org.opensearch.core.action.ActionResponse;
 import org.opensearch.action.NodePrometheusMetricsAction;
 import org.opensearch.action.TransportNodePrometheusMetricsAction;
 import org.opensearch.cluster.metadata.IndexNameExpressionResolver;
