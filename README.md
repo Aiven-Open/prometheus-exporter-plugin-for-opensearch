@@ -239,7 +239,7 @@ Just keep in mind that `metrics_path` must be `/_prometheus/metrics`, otherwise 
 
 ## Build from Source
 
-To build the plugin you need JDK 14:
+To build the plugin you need JDK 17:
 
 ```
 ./gradlew clean build
