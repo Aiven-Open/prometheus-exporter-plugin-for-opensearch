@@ -43,6 +43,7 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
     private final NodeStats[] nodeStats;
     @Nullable private final IndicesStatsResponse indicesStats;
     private ClusterStatsData clusterStatsData = null;
+    @Nullable private final SnapshotsResponse snapshotsResponse;
 
     /**
      * A constructor that materialize the instance from inputStream.
@@ -56,6 +57,7 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
         nodeStats = in.readArray(NodeStats::new, NodeStats[]::new);
         indicesStats = PackageAccessHelper.createIndicesStatsResponse(in);
         clusterStatsData = new ClusterStatsData(in);
+        snapshotsResponse = new SnapshotsResponse(in);
     }
 
     /**
@@ -65,6 +67,7 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
      * @param nodesStats NodesStats
      * @param indicesStats IndicesStats
      * @param clusterStateResponse ClusterStateResponse
+     * @param snapshotsResponse SnapshotsResponse
      * @param settings Settings
      * @param clusterSettings ClusterSettings
      */
@@ -73,6 +76,7 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
                                          NodeStats[] nodesStats,
                                          @Nullable IndicesStatsResponse indicesStats,
                                          @Nullable ClusterStateResponse clusterStateResponse,
+                                         @Nullable SnapshotsResponse snapshotsResponse,
                                          Settings settings,
                                          ClusterSettings clusterSettings) {
         this.clusterHealth = clusterHealth;
@@ -82,6 +86,7 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
         if (clusterStateResponse != null) {
             this.clusterStatsData = new ClusterStatsData(clusterStateResponse, settings, clusterSettings);
         }
+        this.snapshotsResponse = snapshotsResponse;
     }
 
     /**
@@ -104,6 +109,15 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
      */
     public NodeStats[] getNodeStats() {
         return this.nodeStats;
+    }
+
+    /**
+     * Get internal {@link SnapshotsResponse} object.
+     * @return SnapshotsResponse object
+     */
+    @Nullable
+    public SnapshotsResponse getSnapshotsResponse() {
+        return this.snapshotsResponse;
     }
 
     /**
@@ -131,5 +145,6 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
         out.writeArray(nodeStats);
         out.writeOptionalWriteable(indicesStats);
         clusterStatsData.writeTo(out);
+        snapshotsResponse.writeTo(out);
     }
 }

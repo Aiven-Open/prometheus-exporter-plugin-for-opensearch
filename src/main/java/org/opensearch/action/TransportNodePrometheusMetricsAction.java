@@ -28,6 +28,10 @@ import org.opensearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.opensearch.action.admin.cluster.node.stats.NodeStats;
 import org.opensearch.action.admin.cluster.node.stats.NodesStatsRequest;
 import org.opensearch.action.admin.cluster.node.stats.NodesStatsResponse;
+import org.opensearch.action.admin.cluster.repositories.get.GetRepositoriesRequest;
+import org.opensearch.action.admin.cluster.repositories.get.GetRepositoriesResponse;
+import org.opensearch.action.admin.cluster.snapshots.get.GetSnapshotsRequest;
+import org.opensearch.action.admin.cluster.snapshots.get.GetSnapshotsResponse;
 import org.opensearch.action.admin.cluster.state.ClusterStateRequest;
 import org.opensearch.action.admin.cluster.state.ClusterStateResponse;
 import org.opensearch.action.admin.indices.stats.IndicesStatsRequest;
@@ -37,12 +41,19 @@ import org.opensearch.action.support.HandledTransportAction;
 import org.opensearch.client.Client;
 import org.opensearch.client.Requests;
 import org.opensearch.common.Nullable;
+import org.opensearch.common.action.ActionFuture;
 import org.opensearch.common.inject.Inject;
 import org.opensearch.common.settings.ClusterSettings;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.action.ActionListener;
+import org.opensearch.snapshots.SnapshotInfo;
 import org.opensearch.tasks.Task;
 import org.opensearch.transport.TransportService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * Transport action class for Prometheus Exporter plugin.
@@ -94,15 +105,17 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
         private final NodesStatsRequest nodesStatsRequest;
         private final IndicesStatsRequest indicesStatsRequest;
         private final ClusterStateRequest clusterStateRequest;
-
+        private final GetRepositoriesRequest repositoriesRequest;
         private ClusterHealthResponse clusterHealthResponse = null;
         private NodesInfoResponse localNodesInfoResponse = null;
         private NodesStatsResponse nodesStatsResponse = null;
         private IndicesStatsResponse indicesStatsResponse = null;
         private ClusterStateResponse clusterStateResponse = null;
+        private SnapshotsResponse snapshotsResponse = null;
 
         // read the state of prometheus dynamic settings only once at the beginning of the async request
         private final boolean isPrometheusIndices = prometheusSettings.getPrometheusIndices();
+        private final boolean isPrometheusSnapshots = prometheusSettings.getPrometheusSnapshots();
         private final boolean isPrometheusClusterSettings = prometheusSettings.getPrometheusClusterSettings();
         private final String prometheusNodesFilter = prometheusSettings.getNodesFilter();
 
@@ -142,6 +155,12 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
                 this.indicesStatsRequest = null;
             }
 
+            if (isPrometheusSnapshots) {
+                this.repositoriesRequest = new GetRepositoriesRequest();
+            } else {
+                this.repositoriesRequest = null;
+            }
+
             // Cluster settings are get via ClusterStateRequest (see elasticsearch RestClusterGetSettingsAction for details)
             // We prefer to send it to master node (hence local=false; it should be set by default but we want to be sure).
             this.clusterStateRequest = isPrometheusClusterSettings ? Requests.clusterStateRequest()
@@ -150,15 +169,47 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
 
         private void gatherRequests() {
             listener.onResponse(buildResponse(clusterHealthResponse, localNodesInfoResponse, nodesStatsResponse, indicesStatsResponse,
-                    clusterStateResponse));
+                    clusterStateResponse, snapshotsResponse));
         }
+
+        private final ActionListener<GetRepositoriesResponse> repositoriesResponseActionListener =
+            new ActionListener<GetRepositoriesResponse>() {
+                @Override
+                public void onResponse(GetRepositoriesResponse response) {
+                    List<ActionFuture<GetSnapshotsResponse>> snapshotsResponseFutures = response.repositories().stream()
+                            .map(metadata -> new GetSnapshotsRequest(metadata.name()))
+                            .map(snapshotsRequest -> client.admin().cluster().getSnapshots(snapshotsRequest))
+                            .collect(Collectors.toList());
+                    List<SnapshotInfo> snapshotInfos = new ArrayList<>();
+                    for (ActionFuture<GetSnapshotsResponse> snapshotsResponseFuture : snapshotsResponseFutures) {
+                        try {
+                            GetSnapshotsResponse getSnapshotsResponse = snapshotsResponseFuture.get();
+                            snapshotInfos.addAll(getSnapshotsResponse.getSnapshots());
+                        } catch (InterruptedException | ExecutionException e) {
+                            listener.onFailure(new OpenSearchException("Get snapshots request failed", e));
+                            return;
+                        }
+                    }
+                    snapshotsResponse = new SnapshotsResponse(snapshotInfos);
+                    gatherRequests();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    listener.onFailure(new OpenSearchException("Get repositories request failed", e));
+                }
+            };
 
         private final ActionListener<ClusterStateResponse> clusterStateResponseActionListener =
             new ActionListener<ClusterStateResponse>() {
                 @Override
                 public void onResponse(ClusterStateResponse response) {
                     clusterStateResponse = response;
-                    gatherRequests();
+                    if (isPrometheusSnapshots) {
+                        client.admin().cluster().getRepositories(repositoriesRequest, repositoriesResponseActionListener);
+                    } else {
+                        gatherRequests();
+                    }
                 }
 
                 @Override
@@ -175,7 +226,7 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
                     if (isPrometheusClusterSettings) {
                         client.admin().cluster().state(clusterStateRequest, clusterStateResponseActionListener);
                     } else {
-                        gatherRequests();
+                        clusterStateResponseActionListener.onResponse(null);
                     }
                 }
 
@@ -239,12 +290,13 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
                                                               NodesInfoResponse localNodesInfoResponse,
                                                               NodesStatsResponse nodesStats,
                                                               @Nullable IndicesStatsResponse indicesStats,
-                                                              @Nullable ClusterStateResponse clusterStateResponse) {
+                                                              @Nullable ClusterStateResponse clusterStateResponse,
+                                                              @Nullable SnapshotsResponse snapshotsResponse) {
             NodePrometheusMetricsResponse response = new NodePrometheusMetricsResponse(
                     clusterHealth,
                     localNodesInfoResponse,
                     nodesStats.getNodes().toArray(new NodeStats[0]),
-                    indicesStats, clusterStateResponse,
+                    indicesStats, clusterStateResponse, snapshotsResponse,
                     settings, clusterSettings);
             if (logger.isTraceEnabled()) {
                 logger.trace("Return response: [{}]", response);
