@@ -145,6 +145,13 @@ To disable exporting cluster settings use:
 prometheus.cluster.settings: false
 ```
 
+#### Snapshot metrics
+
+To enable exporting snapshot metrics use:
+```
+prometheus.snapshots: true
+```
+
 #### Nodes filter
 
 Metrics include statistics about individual OpenSearch nodes.

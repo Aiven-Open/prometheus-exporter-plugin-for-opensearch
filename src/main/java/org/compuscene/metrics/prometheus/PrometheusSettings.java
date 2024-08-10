@@ -55,7 +55,7 @@ public class PrometheusSettings {
     static String PROMETHEUS_SELECTED_OPTION_KEY = "prometheus.indices_filter.selected_option";
 
     /**
-     * This setting is used configure weather to expose cluster settings metrics or not. The default value is true.
+     * This setting is used configure whether to expose cluster settings metrics or not. The default value is true.
      * Can be configured in opensearch.yml file or update dynamically under key {@link #PROMETHEUS_CLUSTER_SETTINGS_KEY}.
      */
     public static final Setting<Boolean> PROMETHEUS_CLUSTER_SETTINGS =
@@ -63,7 +63,7 @@ public class PrometheusSettings {
                     Setting.Property.Dynamic, Setting.Property.NodeScope);
 
     /**
-     * This setting is used configure weather to expose low level index metrics or not. The default value is true.
+     * This setting is used configure whether to expose low level index metrics or not. The default value is true.
      * Can be configured in opensearch.yml file or update dynamically under key {@link #PROMETHEUS_INDICES_KEY}.
      */
     public static final Setting<Boolean> PROMETHEUS_INDICES =
@@ -71,7 +71,7 @@ public class PrometheusSettings {
                     Setting.Property.Dynamic, Setting.Property.NodeScope);
 
     /**
-     * This setting is used configure weather to expose snapshot metrics or not. The default value is false.
+     * This setting is used configure whether to expose snapshot metrics or not. The default value is false.
      * Can be configured in opensearch.yml file or update dynamically under key {@link #PROMETHEUS_SNAPSHOTS_KEY}.
      */
     public static final Setting<Boolean> PROMETHEUS_SNAPSHOTS =

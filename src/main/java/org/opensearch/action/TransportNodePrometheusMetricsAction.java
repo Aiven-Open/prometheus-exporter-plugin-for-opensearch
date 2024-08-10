@@ -40,19 +40,17 @@ import org.opensearch.action.support.ActionFilters;
 import org.opensearch.action.support.HandledTransportAction;
 import org.opensearch.client.Client;
 import org.opensearch.client.Requests;
+import org.opensearch.cluster.metadata.RepositoryMetadata;
 import org.opensearch.common.Nullable;
-import org.opensearch.common.action.ActionFuture;
 import org.opensearch.common.inject.Inject;
 import org.opensearch.common.settings.ClusterSettings;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.core.action.ActionListener;
-import org.opensearch.snapshots.SnapshotInfo;
 import org.opensearch.tasks.Task;
 import org.opensearch.transport.TransportService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 /**
@@ -111,7 +109,8 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
         private NodesStatsResponse nodesStatsResponse = null;
         private IndicesStatsResponse indicesStatsResponse = null;
         private ClusterStateResponse clusterStateResponse = null;
-        private SnapshotsResponse snapshotsResponse = null;
+        private final Queue<String> snapshotRepositories = new ConcurrentLinkedQueue<>();
+        private final SnapshotsResponse snapshotsResponse = new SnapshotsResponse();
 
         // read the state of prometheus dynamic settings only once at the beginning of the async request
         private final boolean isPrometheusIndices = prometheusSettings.getPrometheusIndices();
@@ -176,27 +175,39 @@ public class TransportNodePrometheusMetricsAction extends HandledTransportAction
             new ActionListener<GetRepositoriesResponse>() {
                 @Override
                 public void onResponse(GetRepositoriesResponse response) {
-                    List<ActionFuture<GetSnapshotsResponse>> snapshotsResponseFutures = response.repositories().stream()
-                            .map(metadata -> new GetSnapshotsRequest(metadata.name()))
-                            .map(snapshotsRequest -> client.admin().cluster().getSnapshots(snapshotsRequest))
-                            .collect(Collectors.toList());
-                    List<SnapshotInfo> snapshotInfos = new ArrayList<>();
-                    for (ActionFuture<GetSnapshotsResponse> snapshotsResponseFuture : snapshotsResponseFutures) {
-                        try {
-                            GetSnapshotsResponse getSnapshotsResponse = snapshotsResponseFuture.get();
-                            snapshotInfos.addAll(getSnapshotsResponse.getSnapshots());
-                        } catch (InterruptedException | ExecutionException e) {
-                            listener.onFailure(new OpenSearchException("Get snapshots request failed", e));
-                            return;
-                        }
+                    if (response.repositories().isEmpty()) {
+                        gatherRequests();
+                        return;
                     }
-                    snapshotsResponse = new SnapshotsResponse(snapshotInfos);
-                    gatherRequests();
+                    snapshotRepositories.addAll(response.repositories().stream()
+                            .map(RepositoryMetadata::name).collect(Collectors.toList()));
+                    String snapshotRepository = snapshotRepositories.poll();
+                    client.admin().cluster().getSnapshots(new GetSnapshotsRequest(snapshotRepository), snapshotsResponseActionListener);
                 }
 
                 @Override
                 public void onFailure(Exception e) {
                     listener.onFailure(new OpenSearchException("Get repositories request failed", e));
+                }
+            };
+
+        private final ActionListener<GetSnapshotsResponse> snapshotsResponseActionListener =
+            new ActionListener<GetSnapshotsResponse>() {
+                @Override
+                public void onResponse(GetSnapshotsResponse response) {
+                    snapshotsResponse.addSnapshotInfos(response.getSnapshots());
+                    if (snapshotRepositories.isEmpty()) {
+                        gatherRequests();
+                        return;
+                    }
+                    // Fetch the snapshots for the next repository in the queue
+                    String snapshotRepository = snapshotRepositories.poll();
+                    client.admin().cluster().getSnapshots(new GetSnapshotsRequest(snapshotRepository), snapshotsResponseActionListener);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    listener.onFailure(new OpenSearchException("Get snapshots request failed", e));
                 }
             };
 

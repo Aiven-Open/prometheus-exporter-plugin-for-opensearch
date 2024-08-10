@@ -23,6 +23,7 @@ import org.opensearch.core.common.io.stream.StreamOutput;
 import org.opensearch.snapshots.SnapshotInfo;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,16 +40,14 @@ public class SnapshotsResponse extends ActionResponse {
      */
     public SnapshotsResponse(StreamInput in) throws IOException {
         super(in);
-        snapshotInfos = in.readList(SnapshotInfo::new);
+        snapshotInfos = Collections.synchronizedList(in.readList(SnapshotInfo::new));
     }
 
     /**
      * A constructor.
-     *
-     * @param snapshotInfos A list of {@link SnapshotInfo} objects to initialize the instance with.
      */
-    public SnapshotsResponse(List<SnapshotInfo> snapshotInfos) {
-        this.snapshotInfos = Collections.unmodifiableList(snapshotInfos);
+    public SnapshotsResponse() {
+        this.snapshotInfos = Collections.synchronizedList(new ArrayList<>());
     }
 
     /**
@@ -64,11 +63,17 @@ public class SnapshotsResponse extends ActionResponse {
 
     /**
      * Getter for {@code snapshotInfos} list.
-     * The returned list is unmodifiable to ensure immutability.
      *
      * @return the list of {@link SnapshotInfo} objects
      */
     public List<SnapshotInfo> getSnapshotInfos() {
         return snapshotInfos;
+    }
+
+    /**
+     * Adds {@code snapshotInfosToAdd} to the {@code snapshotInfos} list.
+     */
+    public void addSnapshotInfos(List<SnapshotInfo> snapshotInfosToAdd) {
+        snapshotInfos.addAll(snapshotInfosToAdd);
     }
 }
