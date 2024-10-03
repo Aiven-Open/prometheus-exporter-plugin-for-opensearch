@@ -129,7 +129,7 @@ prometheus.metric_name.prefix: "opensearch_"
 
 ### Dynamic settings
 
-Dynamic settings are configured in `config/opensearch.yml` but they can also be [updated](https://opensearch.org/docs/latest/opensearch/configuration/#update-cluster-settings-using-the-api) at any time via REST API.
+Dynamic settings are configured in `config/opensearch.yml` but they can also be [updated](https://opensearch.org/docs/latest/install-and-configure/configuring-opensearch/index/#updating-cluster-settings-using-the-api) at any time via REST API.
 
 #### Index level metrics
 
@@ -155,7 +155,7 @@ Metrics include statistics about individual OpenSearch nodes.
 By default, only statistics from the node that received the request are included.
 
 Prometheus exporter can be configured to include statistics from other nodes as well.
-This filter is directly utilizing OpenSearch [Node filters](https://opensearch.org/docs/latest/opensearch/rest-api/nodes-apis/index/#node-filters) feature.
+This filter is directly utilizing OpenSearch [Node filters](https://opensearch.org/docs/latest/api-reference/nodes-apis/index/#node-filters) feature.
 Default value: `"_local"`.
 
 For example to get stats for all cluster nodes from any node use settings:
