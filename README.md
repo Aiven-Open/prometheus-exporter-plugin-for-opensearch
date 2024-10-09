@@ -151,7 +151,7 @@ prometheus.cluster.settings: false
 
 #### Snapshot metrics
 
-To enable exporting snapshot metrics use:
+By default, snapshot metrics are disabled. To enable exporting snapshot metrics use:
 ```
 prometheus.snapshots: true
 ```

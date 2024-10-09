@@ -17,6 +17,7 @@
 
 package org.opensearch.action;
 
+import org.opensearch.Version;
 import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.opensearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.opensearch.action.admin.cluster.node.stats.NodeStats;
@@ -29,6 +30,7 @@ import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.core.common.io.stream.StreamOutput;
 import org.opensearch.common.settings.ClusterSettings;
 import org.opensearch.common.settings.Settings;
+import org.opensearch.search.pipeline.SearchPipelineStats;
 
 import java.io.IOException;
 
@@ -57,7 +59,11 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
         nodeStats = in.readArray(NodeStats::new, NodeStats[]::new);
         indicesStats = PackageAccessHelper.createIndicesStatsResponse(in);
         clusterStatsData = new ClusterStatsData(in);
-        snapshotsResponse = new SnapshotsResponse(in);
+        if (in.getVersion().onOrAfter(Version.V_2_17_1)) {
+            snapshotsResponse = new SnapshotsResponse(in);
+        } else {
+            snapshotsResponse = null;
+        }
     }
 
     /**
@@ -145,6 +151,8 @@ public class NodePrometheusMetricsResponse extends ActionResponse {
         out.writeArray(nodeStats);
         out.writeOptionalWriteable(indicesStats);
         clusterStatsData.writeTo(out);
-        snapshotsResponse.writeTo(out);
+        if (out.getVersion().onOrAfter(Version.V_2_17_1)) {
+            snapshotsResponse.writeTo(out);
+        }
     }
 }

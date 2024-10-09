@@ -126,7 +126,7 @@ tasks.named("check").configure { dependsOn(integTest) }
 testingConventions.enabled = false
 
 // Directory for snapshot repository
-File repositoryDir = new File(project.buildDir, "shared-repository")
+File repositoryDir = new File(project.layout.buildDirectory.get().asFile, "shared-repository")
 
 testClusters.all {
     numberOfNodes = 2
