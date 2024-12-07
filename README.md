@@ -144,6 +144,8 @@ prometheus.indices: false
 
 #### Cluster settings
 
+Whether to export cluster settings metrics or not. Default value: `true`.
+
 To disable exporting cluster settings use:
 ```
 prometheus.cluster.settings: false
