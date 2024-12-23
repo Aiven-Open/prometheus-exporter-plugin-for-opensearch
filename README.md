@@ -12,6 +12,7 @@ The [Prometheus® exporter](https://prometheus.io/docs/instrumenting/writing_exp
 - [Usage](#usage)
 - [Build from Source](#build-from-source)
 - [Testing](#testing)
+  - [BWC Testing](#bwc-testing)
 - [License](#license)
 - [Trademarks & Attributions](#trademarks--attributions)
 
@@ -278,6 +279,20 @@ To run individual integration rest test file use:
 ./gradlew :yamlRestTest \
   -Dtests.method="test {yaml=/20_11_index_level_metrics_disabled/Dynamically disable index level metrics}"
 ```
+
+### BWC Testing
+
+Backward Compatibility (BWC) Testing is run manually using provided shell script:
+
+```
+./bwctest.sh
+```
+
+It is not part of `./gradlew [build|check]` task(s), but it is included in the CI workflow.
+
+OpenSearch versions used during BWC tests use determined by properties located in `gradle.properties` file. Specifically `project.version` and `project.BWCversion`. Version of plugin deployed into `project.BWCversion` cluster is specified by `project.BWCPluginVersion` property.
+
+In the beginning of BWC tests the actual version of plugin (`project.version`) is build using `bundlePlugin` gradle task and the `project.BWCPluginVersion` plugin is downloaded from GitHub releases. Both ZIP files are placed into `src/test/resource/org/opensearch/prometheus-exrpoter/bwc/prometheus-exporter` folder (this folder is ignored by git). 
 
 ## License
 

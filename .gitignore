@@ -2,6 +2,9 @@
 # https://discuss.elastic.co/t/leftovers-after-integtestrunner-in-root/152610
 \.local*-integTestRunner-execution-times.log
 
+# This location is used by BWC test clusters to host older and actual versions of plugin ZIP files.
+src/test/resources/org/opensearch/prometheus-exporter/bwc/
+
 # intellij files
 .idea/
 *.iml
