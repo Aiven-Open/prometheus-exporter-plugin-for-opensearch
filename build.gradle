@@ -174,11 +174,15 @@ task copyZIPBundle {
     }
 }
 
+// A hack. For some reason we can not reference 'ext' variables from testClusters, hence we define actual opensearch
+// version the following way which seems to work fine for testClusters. See issue #324
+project.opensearch_version = ext.versions.opensearch
+
 // Clusters for BWC tests
 2.times { i ->
     testClusters {
         "${baseName}$i" {
-            versions = [project.BWCversion, "2.17.1"]
+            versions = [project.BWCversion, project.opensearch_version]
             numberOfNodes = 3
             plugin(provider(new Callable<RegularFile>() {
                 @Override
